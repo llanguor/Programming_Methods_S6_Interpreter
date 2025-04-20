@@ -128,14 +128,7 @@ void trie<tvalue>::upsert(
         current_node = current_node->subtrees[it->second];
     }
 
-    if (current_node->value == nullptr)
-    {
-        current_node->value = new tvalue(std::forward<tvalue>(value));
-    }
-    else
-    {
-        *(current_node->value) = std::forward<tvalue>(value);
-    }
+    current_node->value = std::forward<tvalue>(value);
 }
 
 template<
@@ -144,7 +137,7 @@ tvalue &trie<tvalue>::obtain(
     std::string const &key)
 {
     auto path = find_path(key);
-    if (*path.top() == nullptr || (*path.top())->value == nullptr)
+    if (*path.top() == nullptr || !(*path.top())->value)
     {
         throw std::out_of_range("key is not contained in trie");
     }
@@ -158,14 +151,13 @@ tvalue trie<tvalue>::dispose(
 {
     auto path = find_path(key);
     auto current_node = path.top();
-    if (*current_node == nullptr || (*current_node)->value == nullptr)
+    if (*current_node == nullptr || !(*current_node)->value)
     {
         throw std::out_of_range("key is not contained in trie");
     }
 
     auto result_value = *(*current_node)->value;
-    delete (*current_node)->value;
-    (*current_node)->value=nullptr;
+    (*current_node)->value=std::nullopt;
 
     //Because if path.size==1 then path.top()==&_root
     while (path.size()>1)
@@ -176,7 +168,7 @@ tvalue trie<tvalue>::dispose(
                 return result_value;
         }
 
-        if ((*current_node)->value!=nullptr)
+        if (!(*current_node)->value)
         {
             return result_value;
         }

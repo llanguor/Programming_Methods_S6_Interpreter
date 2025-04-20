@@ -11,9 +11,6 @@
 #include <unordered_map>
 
 
-// std::optional<T>
-// std::variant<T>
-
 
 template<
     typename tvalue>
@@ -27,12 +24,12 @@ private:
     {
 
         std::vector<node *> subtrees;
-        tvalue *value;
+        std::optional<tvalue> value;
 
         explicit node(
             std::map<char, size_t> const &alphabet):
                 subtrees(alphabet.size()),
-                value(nullptr)
+                value(std::nullopt)
         {
             for (auto &s: subtrees)
             {
