@@ -7,7 +7,8 @@ file(GLOB_RECURSE TRIE_HEADERS CONFIGURE_DEPENDS
         include/*.h
 )
 
-add_library(trie ${TRIE_SOURCES} ${TRIE_HEADERS})
+add_library(trie ${TRIE_SOURCES} ${TRIE_HEADERS}
+        src/trie.cpp)
 
 target_include_directories(trie PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
