@@ -153,15 +153,36 @@ tvalue trie<tvalue>::dispose(
     std::string const &key)
 {
     auto path = find_path(key);
-    if (*path.top() == nullptr || (*path.top())->value == nullptr)
+    auto current_node = path.pop();
+    if (*current_node == nullptr || (*current_node)->value == nullptr)
     {
         throw std::out_of_range("key is not contained in trie");
     }
 
-    auto result_value = (*path.top())->value;
-    delete (*path.top())->value;
+    auto result_value = *(*current_node)->value;
+    delete (*current_node)->value;
+    (*current_node)->value=nullptr;
 
+    //Because if path.size==1 then path.top()==&_root
+    while (path.size()>1)
+    {
+        for (auto subtree: (*current_node)->subtrees)
+        {
+            if (subtree != nullptr)
+                return result_value;
+        }
 
+        if ((*current_node)->value!=nullptr)
+        {
+            return result_value;
+        }
+
+        delete *current_node;
+        *current_node = nullptr;
+
+        path.pop();
+        current_node = path.top();
+    }
 
     return result_value;
 }
