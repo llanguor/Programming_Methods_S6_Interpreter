@@ -3,7 +3,6 @@
 
 #include "trie.h"
 
-
 template<
     typename tvalue>
 trie<tvalue>::trie(
@@ -31,57 +30,18 @@ trie<tvalue>::trie(
         _alphabet_mapping[a] = i++;
     }
 
-    _root = new node(_alphabet_mapping);
+    _root.reset(new node(_alphabet_mapping));
 }
 
 template<
     typename tvalue>
-trie<tvalue>::trie(
-    trie<tvalue> const &other)
-{
-
-}
-
-template<
-    typename tvalue>
-trie<tvalue>& trie<tvalue>::operator=(
-    trie<tvalue> const &other)
-{
-
-}
-
-template<
-    typename tvalue>
-trie<tvalue>::trie(
-    trie<tvalue> &&other) noexcept
-{
-
-}
-
-template<
-    typename tvalue>
-trie<tvalue>& trie<tvalue>::operator=(
-    trie<tvalue> &&other) noexcept
-{
-
-}
-
-template<
-    typename tvalue>
-trie<tvalue>::~trie() noexcept
-{
-
-}
-
-template<
-    typename tvalue>
-std::stack<typename trie<tvalue>::node **> trie<tvalue>::find_path(
+std::stack<typename std::shared_ptr<typename trie<tvalue>::node>*> trie<tvalue>::find_path(
     std::string const &key)
 {
-    std::stack<trie<tvalue>::node **> path;
-    auto *current = _root;
-
+    std::stack<std::shared_ptr<trie::node>*> path;
+    auto * current = &_root;
     path.push(&_root);
+
     for (auto k: key)
     {
         auto it = _alphabet_mapping.find(k);
@@ -92,10 +52,11 @@ std::stack<typename trie<tvalue>::node **> trie<tvalue>::find_path(
 
         // THIS IS BAD
         // current = current->subtrees[it->second];
-        // path.push(&current);
+        // path.push(&current)
 
-        path.push(&current->subtrees[it->second]);
-        if ((current = current->subtrees[it->second]) == nullptr)
+        path.push(&current->get()->subtrees[it->second]);
+        current = &current->get()->subtrees[it->second];
+        if (*current == nullptr)
         {
             return path;
         }
@@ -110,7 +71,7 @@ void trie<tvalue>::upsert(
     std::string const &key,
     tvalue &&value)
 {
-    auto *current_node = _root;
+    auto current_node = &_root;
 
     for (auto k: key)
     {
@@ -120,15 +81,15 @@ void trie<tvalue>::upsert(
             throw std::out_of_range("character is not contained in alphabet");
         }
 
-        if (current_node->subtrees[it->second] == nullptr)
+        if (current_node->get()->subtrees[it->second] == nullptr)
         {
-            current_node->subtrees[it->second] = new node(_alphabet_mapping);
+            current_node->get()->subtrees[it->second].reset(new node(_alphabet_mapping));
         }
 
-        current_node = current_node->subtrees[it->second];
+        current_node = &current_node->get()->subtrees[it->second];
     }
 
-    current_node->value = std::forward<tvalue>(value);
+    current_node->get()->value = std::forward<tvalue>(value);
 }
 
 template<
@@ -162,7 +123,7 @@ tvalue trie<tvalue>::dispose(
     //Because if path.size==1 then path.top()==&_root
     while (path.size()>1)
     {
-        for (auto subtree: (*current_node)->subtrees)
+        for (auto &subtree: (*current_node)->subtrees)
         {
             if (subtree != nullptr)
                 return result_value;
@@ -173,8 +134,7 @@ tvalue trie<tvalue>::dispose(
             return result_value;
         }
 
-        delete *current_node;
-        *current_node = nullptr;
+        current_node->reset();
 
         path.pop();
         current_node = path.top();

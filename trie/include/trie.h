@@ -8,8 +8,7 @@
 #include <stack>
 #include <vector>
 #include <optional>
-#include <unordered_map>
-
+#include <memory>
 
 
 template<
@@ -23,7 +22,7 @@ private:
     struct node
     {
 
-        std::vector<node *> subtrees;
+        std::vector<std::shared_ptr<node>> subtrees;
         std::optional<tvalue> value;
 
         explicit node(
@@ -31,17 +30,13 @@ private:
                 subtrees(alphabet.size()),
                 value(std::nullopt)
         {
-            for (auto &s: subtrees)
-            {
-                s = nullptr;
-            }
-        }
 
+        }
     };
 
 private:
 
-    trie::node *_root;
+    std::shared_ptr<trie::node> _root;
     std::map<char, size_t> _alphabet_mapping;
 
 public:
@@ -49,25 +44,9 @@ public:
     explicit trie(
         std::string const &alphabet);
 
-public:
-
-    trie(
-        trie const &other);
-
-    trie& operator=(
-        trie const &other);
-
-    trie(
-        trie &&other) noexcept;
-
-    trie &operator=(
-        trie &&other) noexcept;
-
-    ~trie() noexcept override;
-
 private:
 
-    std::stack<trie<tvalue>::node **> find_path(
+    std::stack<std::shared_ptr<trie::node> *> find_path(
         std::string const &key);
 
 public:
@@ -84,6 +63,27 @@ public:
     tvalue dispose(
         std::string const &key)
     override;
+
+public:
+
+    trie(
+        trie const &other)
+    = default;
+
+    trie& operator=(
+        trie const &other)
+    = default;
+
+    trie(
+        trie &&other) noexcept
+    = default;
+
+    trie &operator=(
+        trie &&other) noexcept
+    = default;
+
+    ~trie() noexcept override
+    = default;
 
 };
 
