@@ -1,7 +1,12 @@
 #ifndef TRIE_TPP
 #define TRIE_TPP
 
+#include <utility>
+
 #include "trie.h"
+
+
+//region trie
 
 template<
     typename tvalue>
@@ -112,6 +117,7 @@ tvalue trie<tvalue>::dispose(
 {
     auto path = find_path(key);
     auto current_node = path.top();
+
     if (*current_node == nullptr || !(*current_node)->value)
     {
         throw std::out_of_range("key is not contained in trie");
@@ -119,6 +125,7 @@ tvalue trie<tvalue>::dispose(
 
     auto result_value = *(*current_node)->value;
     (*current_node)->value=std::nullopt;
+
 
     //Because if path.size==1 then path.top()==&_root
     while (path.size()>1)
@@ -129,7 +136,7 @@ tvalue trie<tvalue>::dispose(
                 return result_value;
         }
 
-        if (!(*current_node)->value)
+        if ((*current_node)->value)
         {
             return result_value;
         }
@@ -142,6 +149,235 @@ tvalue trie<tvalue>::dispose(
 
     return result_value;
 }
+
+//endregion trie
+
+
+
+//region iterator_data
+
+template<typename tvalue>
+trie<tvalue>::iterator_data::iterator_data(
+    unsigned int depth,
+    std::string const & key,
+    tvalue const &value):
+    depth(depth),
+    key(key),
+    value(value)
+{
+
+}
+
+//endregion iterator_data
+
+
+
+//region iterator_base
+
+template<typename tvalue>
+trie<tvalue>::iterator_base::iterator_base(
+    std::map<char, size_t> const &alphabet,
+    typename trie<tvalue>::node *subtree_root):
+    _alphabet_mapping(alphabet)
+{
+    for (const auto &k: alphabet)
+    {
+        _alphabet_reverse[k.second] = k.first;
+    }
+
+    _stack.push(subtree_root);
+}
+
+template<typename tvalue>
+typename trie<tvalue>::iterator_data * trie<tvalue>::iterator_base::operator*() const
+{
+    if (_stack.top()==nullptr)
+    {
+        throw std::out_of_range("Attempted to access past-the-end element");
+    }
+
+    return new iterator_data(
+        iterator_base::_stack.size()-1,
+        _assembled_key,
+        iterator_base::_stack.top()->value.value());
+}
+
+
+template<typename tvalue>
+bool trie<tvalue>::iterator_base::operator==(iterator_base const &other) const noexcept
+{
+    return other._stack.top() == this->_stack.top();
+}
+
+template<typename tvalue>
+bool trie<tvalue>::iterator_base::operator!=(iterator_base const &other) const noexcept
+{
+    return other._stack.top() != this->_stack.top();
+}
+
+template<typename tvalue>
+void trie<tvalue>::iterator_base::fall_to_next_bottom()
+{
+    node * current_node = iterator_base::_stack.top();
+    node * start_node = current_node;
+
+    size_t subtree_i;
+    while (subtree_i != iterator_base::_alphabet_reverse.size())
+    {
+        subtree_i = 0;
+
+        if (current_node->value!=std::nullopt &&
+            current_node != start_node)
+        {
+            return;
+        }
+
+        for (auto subtree: current_node->subtrees)
+        {
+            if (subtree != nullptr)
+            {
+                current_node = &*subtree;
+                iterator_base::_stack.push(&*subtree);
+                iterator_base::_assembled_key += iterator_base::_alphabet_reverse[subtree_i];
+                break;
+            }
+
+            ++subtree_i;
+        }
+    }
+}
+
+//endregion iterator_base
+
+
+
+//region infix_iterator
+
+template<typename tvalue>
+trie<tvalue>::infix_iterator::infix_iterator(
+    std::map<char, size_t> const & alphabet,
+    typename trie<tvalue>::node *subtree_root):
+    iterator_base(alphabet, subtree_root)
+{
+    if (iterator_base::_stack.top()==nullptr)
+    {   //end_infix
+        return;
+    }
+
+    if (iterator_base::_stack.top()->value != std::nullopt)
+    {
+        return;
+    }
+
+    iterator_base::fall_to_next_bottom();
+
+    if (iterator_base::_stack.top()->value==std::nullopt)
+    {
+        //all subtrees is nullptr and value is nullpt => tree is empty
+        iterator_base::_stack.push(nullptr);
+    }
+}
+
+template<typename tvalue>
+typename trie<tvalue>::infix_iterator & trie<tvalue>::infix_iterator::operator++()
+{
+    node * start_node = iterator_base::_stack.top();
+    if (iterator_base::_stack.top()==nullptr)
+    {   //end_infix
+        return *this;
+    }
+
+    iterator_base::fall_to_next_bottom();
+    if (iterator_base::_stack.top() != start_node)
+    {
+        return *this;
+    }
+
+
+    while (!iterator_base::_stack.empty())
+    {
+        iterator_base::_stack.pop();
+
+        if (iterator_base::_stack.empty())
+        {
+            //if after pop we get an empty array, then either there are no other nodes
+            //or we have already walked the tree (returned from the right)
+            iterator_base::_stack.push(nullptr);
+            return *this;
+        }
+
+        node * current_node = iterator_base::_stack.top();
+        auto current_subtree_id = iterator_base::_alphabet_mapping.at(
+            iterator_base::_assembled_key.back());
+
+        iterator_base::_assembled_key.pop_back();
+
+        for (int i=current_subtree_id+1; i<iterator_base::_alphabet_mapping.size(); ++i)
+        {
+            auto subtree = & current_node->subtrees[i];
+            if (*subtree != nullptr)
+            {
+                current_node = &**subtree;
+                iterator_base::_stack.push(current_node);
+                iterator_base::_assembled_key += iterator_base::_alphabet_reverse[i];
+
+                if (current_node->value == std::nullopt)
+                {
+                    iterator_base::fall_to_next_bottom();
+                }
+
+                return *this;
+            }
+        }
+    }
+
+    return *this;
+}
+
+template<typename tvalue>
+typename trie<tvalue>::infix_iterator const trie<tvalue>::infix_iterator::operator++(int not_used)
+{
+    infix_iterator temp {*this};
+    ++(*this);
+    return temp;
+}
+
+template<typename tvalue>
+typename trie<tvalue>::infix_iterator trie<tvalue>::begin_infix() const noexcept
+{
+    return trie<tvalue>::infix_iterator(
+        _alphabet_mapping,
+        dynamic_cast<typename trie<tvalue>::node *>(&*_root)
+        );
+}
+
+template<typename tvalue>
+typename trie<tvalue>::infix_iterator trie<tvalue>::end_infix() const noexcept
+{
+    return trie<tvalue>::infix_iterator(
+        _alphabet_mapping,
+        nullptr);
+}
+
+template<typename tvalue>
+typename trie<tvalue>::iterator_data * trie<tvalue>::infix_iterator::operator*() const
+{
+    return iterator_base::operator*();
+}
+
+template<typename tvalue>
+bool trie<tvalue>::infix_iterator::operator!=(infix_iterator const &other) const noexcept
+{
+    return iterator_base::operator!=(other);
+}
+
+template<typename tvalue>
+bool trie<tvalue>::infix_iterator::operator==(infix_iterator const &other) const noexcept
+{
+    return iterator_base::operator==(other);
+}
+
+//endregion infix_iterator
 
 
 #endif

@@ -85,6 +85,92 @@ public:
     ~trie() noexcept override
     = default;
 
+
+public:
+
+    struct iterator_data
+    {
+
+    public:
+
+        unsigned int depth;
+
+        std::string const key;
+
+        tvalue value; //ИМЕННО tvalue. НЕ OPTIONAL<tvalue>
+
+    public:
+
+        explicit iterator_data(
+            unsigned int depth,
+            std::string const & key,
+            tvalue const &value);
+    };
+
+public:
+
+    class iterator_base
+    {
+
+    protected:
+
+        std::string _assembled_key;
+
+        std::stack<node*> _stack;
+
+        std::map<size_t, char> _alphabet_reverse;
+
+        std::map<char, size_t> const & _alphabet_mapping;
+
+        explicit iterator_base(
+            std::map<char, size_t> const & alphabet,
+            typename trie<tvalue>::node *subtree_root);
+
+        bool operator==(
+            iterator_base const &other) const noexcept;
+
+        bool operator!=(
+            iterator_base const &other) const noexcept;
+
+        iterator_data *operator*() const;
+
+        void fall_to_next_bottom();
+    };
+
+
+    class infix_iterator final:iterator_base
+    {
+
+    public:
+
+        explicit infix_iterator(
+            std::map<char, size_t> const & alphabet,
+            typename trie<tvalue>::node *subtree_root);
+
+    public:
+
+        bool operator==(
+            infix_iterator const &other) const noexcept;
+
+        bool operator!=(
+            infix_iterator const &other) const noexcept;
+
+        infix_iterator &operator++();
+
+        infix_iterator const operator++(
+            int not_used);
+
+        iterator_data *operator*() const;
+
+
+    };
+
+public:
+
+    infix_iterator begin_infix() const noexcept;
+
+    infix_iterator end_infix() const noexcept;
+
 };
 
 #include "trie.tpp"
