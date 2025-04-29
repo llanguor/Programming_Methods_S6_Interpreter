@@ -122,6 +122,8 @@ public:
 
         std::map<char, size_t> const & _alphabet_mapping;
 
+    protected:
+
         explicit iterator_base(
             std::map<char, size_t> const & alphabet,
             typename trie<tvalue>::node *subtree_root);

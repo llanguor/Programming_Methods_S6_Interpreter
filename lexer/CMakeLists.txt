@@ -9,13 +9,13 @@ file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS
 )
 
 if(SOURCES)
-    add_library(interpreter ${SOURCES} ${HEADERS})
+    add_library(lexer ${SOURCES} ${HEADERS})
 else()
-    add_library(interpreter ${HEADERS})
-    set_target_properties(interpreter PROPERTIES LINKER_LANGUAGE CXX)
+    add_library(lexer ${HEADERS})
+    set_target_properties(lexer PROPERTIES LINKER_LANGUAGE CXX)
 endif()
 
 
-target_include_directories(interpreter PUBLIC
+target_include_directories(lexer PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

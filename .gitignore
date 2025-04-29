@@ -1,5 +1,6 @@
 #Project structure
 meta/examples
+meta/notes
 
 # JetBrains IDEs
 .idea/
