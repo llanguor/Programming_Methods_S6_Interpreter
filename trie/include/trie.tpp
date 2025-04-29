@@ -335,7 +335,7 @@ typename trie<tvalue>::infix_iterator & trie<tvalue>::infix_iterator::operator++
 }
 
 template<typename tvalue>
-typename trie<tvalue>::infix_iterator const trie<tvalue>::infix_iterator::operator++(int not_used)
+typename trie<tvalue>::infix_iterator trie<tvalue>::infix_iterator::operator++(int not_used)
 {
     infix_iterator temp {*this};
     ++(*this);
@@ -343,7 +343,7 @@ typename trie<tvalue>::infix_iterator const trie<tvalue>::infix_iterator::operat
 }
 
 template<typename tvalue>
-typename trie<tvalue>::infix_iterator trie<tvalue>::begin_infix() const noexcept
+typename trie<tvalue>::infix_iterator trie<tvalue>::begin() const noexcept
 {
     return trie<tvalue>::infix_iterator(
         _alphabet_mapping,
@@ -352,7 +352,7 @@ typename trie<tvalue>::infix_iterator trie<tvalue>::begin_infix() const noexcept
 }
 
 template<typename tvalue>
-typename trie<tvalue>::infix_iterator trie<tvalue>::end_infix() const noexcept
+typename trie<tvalue>::infix_iterator trie<tvalue>::end() const noexcept
 {
     return trie<tvalue>::infix_iterator(
         _alphabet_mapping,

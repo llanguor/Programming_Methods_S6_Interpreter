@@ -97,7 +97,7 @@ public:
 
         std::string const key;
 
-        tvalue value; //ИМЕННО tvalue. НЕ OPTIONAL<tvalue>
+        tvalue value;
 
     public:
 
@@ -157,7 +157,7 @@ public:
 
         infix_iterator &operator++();
 
-        infix_iterator const operator++(
+        infix_iterator operator++(
             int not_used);
 
         iterator_data *operator*() const;
@@ -167,9 +167,9 @@ public:
 
 public:
 
-    infix_iterator begin_infix() const noexcept;
+    infix_iterator begin() const noexcept;
 
-    infix_iterator end_infix() const noexcept;
+    infix_iterator end() const noexcept;
 
 };
 

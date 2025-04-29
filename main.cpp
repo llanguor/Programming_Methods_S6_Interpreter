@@ -18,11 +18,10 @@ int main()
     t->dispose("kyya");
 
 
-    auto inf = t->begin_infix();
-    while (inf!=t->end_infix())
+
+    for (auto const & inf: *t)
     {
-        std::cout<<"Node '" << (*inf)->key <<"' = "<< (*inf)->value << std::endl;
-        ++inf;
+        std::cout<<"Node '" << inf->key <<"' = "<< inf->value << std::endl;
     }
     std::cout<<"End infix";
 

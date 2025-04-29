@@ -3,8 +3,17 @@
 
 
 
-class interpreter {
+class interpreter
+{
 
+
+
+public:
+
+    class builder
+    {
+
+    };
 };
 
 
