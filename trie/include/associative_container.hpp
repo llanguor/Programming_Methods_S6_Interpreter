@@ -1,7 +1,4 @@
-#ifndef ASSOCIATIVE_CONTAINER_H
-#define ASSOCIATIVE_CONTAINER_H
-
-
+#pragma once
 
 template<
     typename tkey,
@@ -26,6 +23,3 @@ public:
         tkey const &key) = 0;
 
 };
-
-
-#endif

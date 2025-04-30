@@ -1,7 +1,5 @@
-#ifndef TRIE_H
-#define TRIE_H
-
-#include "associative_container.h"
+#pragma once
+#include "associative_container.hpp"
 #include <iostream>
 #include <map>
 #include <set>
@@ -176,5 +174,3 @@ public:
 };
 
 #include "trie.tpp"
-
-#endif

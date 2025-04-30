@@ -1,11 +1,11 @@
 #include <iostream>
-#include "trie.h"
+#include "trie.hpp"
 #include <string>
 #include <memory>
 #include <sstream>
 
-#include "comments_handler.h"
-#include "lexer.h"
+#include "comments_handler.hpp"
+#include "lexer.hpp"
 
 int main()
 {

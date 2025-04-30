@@ -1,9 +1,8 @@
-#ifndef TRIE_TPP
-#define TRIE_TPP
+#pragma once
 
 #include <utility>
 
-#include "trie.h"
+#include "trie.hpp"
 
 
 #pragma region trie
@@ -372,6 +371,3 @@ bool trie<tvalue>::infix_iterator::operator==(infix_iterator const &other) const
 }
 
 #pragma endregion
-
-
-#endif

@@ -1,8 +1,6 @@
-#ifndef LEXER_H
-#define LEXER_H
-
+#pragma once
 #include <memory>
-#include "comments_handler.h"
+#include "comments_handler.hpp"
 #include <regex>
 
 class lexer
@@ -66,5 +64,3 @@ public:
     [[nodiscard]] iterator end() const;
 
 };
-
-#endif

@@ -1,6 +1,4 @@
-#ifndef COMMENTS_HANDLER_H
-#define COMMENTS_HANDLER_H
-
+#pragma once
 #include <string>
 #include <fstream>
 #include <variant>
@@ -66,7 +64,3 @@ public:
     [[nodiscard]] iterator end() const;
 
 };
-
-
-
-#endif
