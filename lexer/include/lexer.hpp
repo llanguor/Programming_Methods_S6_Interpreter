@@ -8,22 +8,22 @@ class lexer
 {
 public:
 
-    using CONTROL_CHAR_TYPES = comments_handler::control_char_types;
+    using control_char_types = comments_handler::control_char_types;
 
 private:
 
     std::istream * _stream;
     int const _enclosure_max_level;
-    std::regex const * _regex_chars;
-    std::regex const * _regex_separators;
+    std::regex const _regex_chars;
+    std::regex const _regex_separators;
 
 public:
 
     explicit lexer(
        std::istream * stream,
        int enclosure_max_level,
-       std::regex const * regex_chars,
-        std::regex const * regex_separators);
+       std::string const & regex_chars,
+       std::string const & regex_separators);
 
 public:
 

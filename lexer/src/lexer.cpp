@@ -9,8 +9,8 @@
 lexer::lexer(
     std::istream * stream,
     int const enclosure_max_level,
-    std::regex const * regex_chars,
-    std::regex const * regex_separators):
+    std::string const & regex_chars,
+    std::string const & regex_separators):
     _stream(stream),
     _enclosure_max_level(enclosure_max_level),
     _regex_chars(regex_chars),
@@ -20,12 +20,12 @@ lexer::lexer(
 
 lexer::iterator lexer::begin() const
 {
-    return lexer::iterator(_stream, _enclosure_max_level, _regex_chars, _regex_separators);
+    return lexer::iterator(_stream, _enclosure_max_level, &_regex_chars, &_regex_separators);
 }
 
 lexer::iterator lexer::end() const
 {
-    return lexer::iterator(nullptr, _enclosure_max_level, _regex_chars, _regex_separators);
+    return lexer::iterator(nullptr, _enclosure_max_level, &_regex_chars, &_regex_separators);
 }
 
 #pragma endregion

@@ -8,8 +8,12 @@
 #include "lexer.hpp"
 #include<filesystem>
 
+#include "interpreter.hpp"
+#include "builder.hpp"
+
 int main()
 {
+    /*
     std::string const alphabet = "abcdefghijklmnopqrsty";
     auto t (std::make_shared<trie<int>>(alphabet));
     t->upsert("", 1);
@@ -27,7 +31,7 @@ int main()
         std::cout<<"Node '" << inf->key <<"' = "<< inf->value << std::endl;
     }
     std::cout<<"End infix\n";
-
+*/
 
   //  std::istringstream ss("He#l\nlo,[# world!\nas]d. Iasjdnsaj#DEBUG\nndjsandsad");
 
@@ -56,19 +60,17 @@ int main()
     */
 
 
-    std::regex regex_char("[a-zA-Z0-9_]");
-    std::regex regex_separators("[\r\n\t ]+");
-
     //std::cout<<std::filesystem::current_path();
     //std::istringstream ss("ashdbb\nsdasdsad\nasds");
-    std::fstream ss("../meta/input/settings.txt");
+   // std::fstream ss("../meta/input/settings.txt");
 
   /*  if (!ss.is_open())
     {
         std::cout<<"Failed to open settings file"<<std::endl;
     }*/
 
-    auto lex = lexer(&ss, 1, &regex_char, &regex_separators);
+    /*
+    auto lex = lexer(&ss, 1, "[a-zA-Z0-9_]", "[\r\n\t ]+");
     for (auto l : lex)
     {
         if (std::holds_alternative<std::string>(l))
@@ -77,16 +79,21 @@ int main()
         }
         else
         {
-            switch (std::get<lexer::CONTROL_CHAR_TYPES>(l))
+            switch (std::get<lexer::control_char_types>(l))
             {
-                case lexer::CONTROL_CHAR_TYPES::debug:
+                case lexer::control_char_types::debug:
                     std::cout<<"|DEBUG|";
                 default: ;
             }
         }
     }
     std::cout<<"\nEnd lexer\n";
+*/
 
+
+    auto interpreter = interpreter::builder(
+        "../meta/input/settings.txt",
+        1);
 
     return 0;
 }
