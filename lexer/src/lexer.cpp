@@ -10,22 +10,22 @@ lexer::lexer(
     std::istream * stream,
     int const enclosure_max_level,
     std::regex const * regex_chars,
-    std::regex const * separators_chars):
+    std::regex const * regex_separators):
     _stream(stream),
     _enclosure_max_level(enclosure_max_level),
     _regex_chars(regex_chars),
-    _separators_chars(separators_chars)
+    _regex_separators(regex_separators)
 {
 }
 
 lexer::iterator lexer::begin() const
 {
-    return lexer::iterator(_stream, _enclosure_max_level, _regex_chars, _separators_chars);
+    return lexer::iterator(_stream, _enclosure_max_level, _regex_chars, _regex_separators);
 }
 
 lexer::iterator lexer::end() const
 {
-    return lexer::iterator(nullptr, _enclosure_max_level, _regex_chars, _separators_chars);
+    return lexer::iterator(nullptr, _enclosure_max_level, _regex_chars, _regex_separators);
 }
 
 #pragma endregion
@@ -36,18 +36,21 @@ lexer::iterator::iterator(
     std::istream *stream,
     int const enclosure_max_level,
     std::regex const * regex_chars,
-    std::regex const * separators_chars):
+    std::regex const * regex_separators):
     _comments_handler(stream, enclosure_max_level),
     _comments_handler_it(_comments_handler.begin()),
     _regex_chars(regex_chars),
-    _separators_chars(separators_chars)
+    _regex_separators(regex_separators)
 {
-    if (_comments_handler_it == _comments_handler.end())
+
+    if (!stream || !*stream || _comments_handler_it == _comments_handler.end())
     {
         _position = EOF;
     }
-
-    ++(*this);
+    else
+    {
+        ++(*this);
+    }
 }
 
 bool lexer::iterator::operator==(iterator const &other) const noexcept
@@ -56,7 +59,7 @@ bool lexer::iterator::operator==(iterator const &other) const noexcept
         other._position;
 }
 
-std::variant<std::string, comments_handler::CONTROL_CHAR_TYPES> lexer::iterator::operator*() const
+std::variant<std::string, comments_handler::control_char_types> lexer::iterator::operator*() const
 {
     if (_position==EOF)
         throw std::out_of_range("Attempt to dereference end-iterator");
@@ -74,9 +77,9 @@ lexer::iterator & lexer::iterator::operator++()
         auto current_char_value = *_comments_handler_it;
         ++_comments_handler_it;
 
-        if (std::holds_alternative<comments_handler::CONTROL_CHAR_TYPES>(current_char_value))
+        if (std::holds_alternative<comments_handler::control_char_types>(current_char_value))
         {
-            _current_value = std::get<comments_handler::CONTROL_CHAR_TYPES>(current_char_value);
+            _current_value = std::get<comments_handler::control_char_types>(current_char_value);
             return *this;
         }
 
@@ -87,7 +90,7 @@ lexer::iterator & lexer::iterator::operator++()
         {
             lexeme += current_char;
         }
-        else if (std::regex_match(str, *_separators_chars))
+        else if (std::regex_match(str, *_regex_separators))
         {
             if (!lexeme.empty())
             {
@@ -97,7 +100,7 @@ lexer::iterator & lexer::iterator::operator++()
         }
         else
         {
-            throw std::invalid_argument("Unexpected character on position"+std::to_string(_position));
+          //  throw std::invalid_argument(std::format("Unexpected character {} on position {}", current_char, std::to_string(_position)));
         }
     }
 

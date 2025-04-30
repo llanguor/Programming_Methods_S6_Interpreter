@@ -1,5 +1,7 @@
 #include "comments_handler.hpp"
 
+#include <iostream>
+
 #pragma region comments_handler
 
 comments_handler::comments_handler(
@@ -30,7 +32,11 @@ comments_handler::iterator::iterator(
     _stream(stream),
     _enclosure_max_level(enclosure_max_level)
 {
-    if (_stream!=nullptr)
+    if (!_stream || !*_stream)
+    {
+       _stream = nullptr;
+    }
+    else
     {
         _current_value = _stream->get();
     }
@@ -44,7 +50,7 @@ bool comments_handler::iterator::operator==(iterator const &other) const noexcep
             _stream->tellg() == other._stream->tellg());
 }
 
-std::variant<int, comments_handler::CONTROL_CHAR_TYPES> comments_handler::iterator::operator*() const
+std::variant<int, comments_handler::control_char_types> comments_handler::iterator::operator*() const
 {
     if (_stream==nullptr)
         throw std::out_of_range("Attempt to dereference end-iterator");
@@ -68,7 +74,7 @@ comments_handler::iterator & comments_handler::iterator::operator++()
 
             if (_single_line_comment_cache == "DEBUG")
             {
-                _current_value = comments_handler::CONTROL_CHAR_TYPES::DEBUG;
+                _current_value = comments_handler::control_char_types::debug;
                 return *this;
             }
         }

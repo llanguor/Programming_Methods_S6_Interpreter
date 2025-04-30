@@ -6,6 +6,7 @@
 
 #include "comments_handler.hpp"
 #include "lexer.hpp"
+#include<filesystem>
 
 int main()
 {
@@ -53,10 +54,21 @@ int main()
 
     }
     */
-    std::regex char_regex("[a-zA-Z0-9_]");
-    std::regex separators_regex("[\r\n\t ]+");
-    std::istringstream ss("ashdbb\tsdas\n\ndsad\nasds");
-    auto lex = lexer(&ss, 1, &char_regex, &separators_regex);
+
+
+    std::regex regex_char("[a-zA-Z0-9_]");
+    std::regex regex_separators("[\r\n\t ]+");
+
+    //std::cout<<std::filesystem::current_path();
+    //std::istringstream ss("ashdbb\nsdasdsad\nasds");
+    std::fstream ss("../meta/input/settings.txt");
+
+  /*  if (!ss.is_open())
+    {
+        std::cout<<"Failed to open settings file"<<std::endl;
+    }*/
+
+    auto lex = lexer(&ss, 1, &regex_char, &regex_separators);
     for (auto l : lex)
     {
         if (std::holds_alternative<std::string>(l))
@@ -67,7 +79,7 @@ int main()
         {
             switch (std::get<lexer::CONTROL_CHAR_TYPES>(l))
             {
-                case lexer::CONTROL_CHAR_TYPES::DEBUG:
+                case lexer::CONTROL_CHAR_TYPES::debug:
                     std::cout<<"|DEBUG|";
                 default: ;
             }

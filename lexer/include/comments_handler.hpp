@@ -14,9 +14,9 @@ private:
 
 public:
 
-    enum CONTROL_CHAR_TYPES
+    enum control_char_types
     {
-        DEBUG
+        debug
     };
 
 public:
@@ -34,7 +34,7 @@ public:
         std::istream * _stream;
         int _enclosure_max_level;
 
-        std::variant<int, CONTROL_CHAR_TYPES> _current_value = EOF;
+        std::variant<int, control_char_types> _current_value = EOF;
         int _multiline_comment_enclosure_level = 0;
         bool _in_single_line_comment = false;
         std::string _single_line_comment_cache;
@@ -49,7 +49,7 @@ public:
 
         bool operator==(iterator const &other) const noexcept;
 
-        std::variant<int, CONTROL_CHAR_TYPES> operator*() const;
+        std::variant<int, control_char_types> operator*() const;
 
         iterator &operator++();
 
