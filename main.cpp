@@ -3,6 +3,8 @@
 #include <string>
 #include <memory>
 
+#include "comments_handler.h"
+
 int main()
 {
     std::string const alphabet = "abcdefghijklmnopqrsty";
@@ -23,7 +25,16 @@ int main()
     {
         std::cout<<"Node '" << inf->key <<"' = "<< inf->value << std::endl;
     }
-    std::cout<<"End infix";
+    std::cout<<"End infix\n";
+
+
+    std::istringstream ss("He#l\nlo,[# world!\nas]d");
+    auto a = comments_handler(&ss, 1);
+
+    for (int ch: a)
+    {
+        std::cout << static_cast<char>(ch);
+    }
 
     return 0;
 }

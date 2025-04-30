@@ -2,6 +2,9 @@
 #define COMMENTS_HANDLER_H
 
 #include <string>
+#include <sstream>
+#include <memory>
+#include <fstream>
 
 class comments_handler
 {
@@ -9,25 +12,27 @@ private:
 
     enum STREAM_TYPES
     {
-        file,
-        string
+        FILE,
+        STRING
     };
 
 private:
 
-    STREAM_TYPES _stream_type;
-    char const * _stream;
+    std::istream *_stream;
     int _enclosure_max_level;
+    STREAM_TYPES _stream_type;
 
 public:
 
+    //For string
     comments_handler(
-        char const * stream,
-        int  enclosure_max_level);
+        std::istringstream * stream,
+        int enclosure_max_level);
 
+    //For file
     comments_handler(
-        const std::string& stream,
-       int  enclosure_max_level);
+        std::ifstream * stream,
+       int enclosure_max_level);
 
 public:
 
@@ -35,25 +40,21 @@ public:
     {
     private:
 
-        comments_handler const * _owner;
-
-        char const * _stream_ptr;
-
+        comments_handler * _owner;
         int _multiline_comment_enclosure_level = 0;
-
-        bool in_single_line_comment = false;
-
-    public:
-
-        explicit iterator(comments_handler const * owner);
+        bool _in_single_line_comment = false;
+        char _current_char = EOF;
 
     public:
 
-        bool operator!=(iterator const &other) const noexcept;
+        explicit iterator(
+            comments_handler * owner);
+
+    public:
 
         bool operator==(iterator const &other) const noexcept;
 
-        char& operator*() const;
+        int operator*() const;
 
         iterator &operator++();
 

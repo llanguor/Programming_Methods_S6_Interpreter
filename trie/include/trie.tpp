@@ -6,7 +6,7 @@
 #include "trie.h"
 
 
-//region trie
+#pragma region trie
 
 template<
     typename tvalue>
@@ -150,11 +150,9 @@ tvalue trie<tvalue>::dispose(
     return result_value;
 }
 
-//endregion trie
+#pragma endregion
 
-
-
-//region iterator_data
+#pragma region iterator_data
 
 template<typename tvalue>
 trie<tvalue>::iterator_data::iterator_data(
@@ -168,11 +166,9 @@ trie<tvalue>::iterator_data::iterator_data(
 
 }
 
-//endregion iterator_data
+#pragma endregion
 
-
-
-//region iterator_base
+#pragma region iterator_base
 
 template<typename tvalue>
 trie<tvalue>::iterator_base::iterator_base(
@@ -247,11 +243,9 @@ void trie<tvalue>::iterator_base::fall_to_next_bottom()
     }
 }
 
-//endregion iterator_base
+#pragma endregion
 
-
-
-//region infix_iterator
+#pragma region infix_iterator
 
 template<typename tvalue>
 trie<tvalue>::infix_iterator::infix_iterator(
@@ -377,7 +371,7 @@ bool trie<tvalue>::infix_iterator::operator==(infix_iterator const &other) const
     return iterator_base::operator==(other);
 }
 
-//endregion infix_iterator
+#pragma endregion
 
 
 #endif
