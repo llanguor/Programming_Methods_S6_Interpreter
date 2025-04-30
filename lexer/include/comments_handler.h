@@ -2,37 +2,30 @@
 #define COMMENTS_HANDLER_H
 
 #include <string>
-#include <sstream>
-#include <memory>
 #include <fstream>
+#include <variant>
+#include <sstream>
 
 class comments_handler
 {
-private:
-
-    enum STREAM_TYPES
-    {
-        FILE,
-        STRING
-    };
 
 private:
 
-    std::istream *_stream;
-    int _enclosure_max_level;
-    STREAM_TYPES _stream_type;
+    std::istream * _stream;
+    int const _enclosure_max_level;
 
 public:
 
-    //For string
-    comments_handler(
-        std::istringstream * stream,
-        int enclosure_max_level);
+    enum CONTROL_CHAR_TYPES
+    {
+        DEBUG
+    };
 
-    //For file
+public:
+
     comments_handler(
-        std::ifstream * stream,
-       int enclosure_max_level);
+        std::istream * stream,
+        int enclosure_max_level);
 
 public:
 
@@ -40,21 +33,25 @@ public:
     {
     private:
 
-        comments_handler * _owner;
+        std::istream * _stream;
+        int _enclosure_max_level;
+
+        std::variant<int, CONTROL_CHAR_TYPES> _current_value = EOF;
         int _multiline_comment_enclosure_level = 0;
         bool _in_single_line_comment = false;
-        char _current_char = EOF;
+        std::string _single_line_comment_cache;
 
     public:
 
         explicit iterator(
-            comments_handler * owner);
+           std::istream * stream,
+           int enclosure_max_level);
 
     public:
 
         bool operator==(iterator const &other) const noexcept;
 
-        int operator*() const;
+        std::variant<int, CONTROL_CHAR_TYPES> operator*() const;
 
         iterator &operator++();
 
@@ -64,9 +61,9 @@ public:
 
 public:
 
-    iterator begin();
+    [[nodiscard]] iterator begin() const;
 
-    iterator end();
+    [[nodiscard]] iterator end() const;
 
 };
 

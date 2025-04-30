@@ -1,34 +1,23 @@
 #include "comments_handler.h"
 
-
 #pragma region comments_handler
 
 comments_handler::comments_handler(
-    std::istringstream * stream,
+    std::istream * stream,
     int const enclosure_max_level):
-    _stream_type(STREAM_TYPES::STRING),
     _stream(stream),
     _enclosure_max_level(enclosure_max_level)
 {
 }
 
-comments_handler::comments_handler(
-    std::ifstream * stream,
-    int const enclosure_max_level):
-    _stream_type(STREAM_TYPES::FILE),
-    _stream(stream),
-    _enclosure_max_level(enclosure_max_level)
+comments_handler::iterator comments_handler::begin() const
 {
+    return comments_handler::iterator(_stream, _enclosure_max_level);
 }
 
-comments_handler::iterator comments_handler::begin()
+comments_handler::iterator comments_handler::end() const
 {
-    return comments_handler::iterator(this);
-}
-
-comments_handler::iterator comments_handler::end()
-{
-    return comments_handler::iterator(nullptr);
+    return comments_handler::iterator(nullptr, _enclosure_max_level);
 }
 
 #pragma endregion
@@ -36,39 +25,55 @@ comments_handler::iterator comments_handler::end()
 #pragma region iterator
 
 comments_handler::iterator::iterator(
-    comments_handler * owner):
-    _owner(owner)
+    std::istream * stream,
+    int const enclosure_max_level):
+    _stream(stream),
+    _enclosure_max_level(enclosure_max_level)
 {
-    if (owner!=nullptr)
+    if (_stream!=nullptr)
     {
-        owner->_stream->get(_current_char);
+        _current_value = _stream->get();
     }
 }
 
 bool comments_handler::iterator::operator==(iterator const &other) const noexcept
 {
     return
-        _owner==nullptr && other._owner==nullptr ||
-        ( _owner!=nullptr && other._owner!=nullptr &&
-            _owner->_stream->tellg() == other._owner->_stream->tellg());
+        _stream==nullptr && other._stream==nullptr ||
+        ( _stream!=nullptr && other._stream!=nullptr &&
+            _stream->tellg() == other._stream->tellg());
 }
 
-int comments_handler::iterator::operator*() const
+std::variant<int, comments_handler::CONTROL_CHAR_TYPES> comments_handler::iterator::operator*() const
 {
-    if (_owner==nullptr)
+    if (_stream==nullptr)
         throw std::out_of_range("Attempt to dereference end-iterator");
 
-    return _current_char;
+    return _current_value;
 }
 
 comments_handler::iterator & comments_handler::iterator::operator++()
 {
-    if (_owner==nullptr)
+    if (_stream==nullptr)
         return *this;
 
-    while (_owner->_stream->get(_current_char))
+    char ch;
+    while (_stream->get(ch))
     {
-        if (_current_char == '#'
+        _current_value = ch;
+
+        if (_in_single_line_comment)
+        {
+            _single_line_comment_cache+=ch;
+
+            if (_single_line_comment_cache == "DEBUG")
+            {
+                _current_value = comments_handler::CONTROL_CHAR_TYPES::DEBUG;
+                return *this;
+            }
+        }
+
+        if (ch == '#'
             && _multiline_comment_enclosure_level == 0
             && !_in_single_line_comment)
         {
@@ -76,15 +81,16 @@ comments_handler::iterator & comments_handler::iterator::operator++()
             continue;
         }
 
-        if ((_current_char == '\n' || !_current_char) && _in_single_line_comment)
+        if ((ch == '\n' || !ch) && _in_single_line_comment)
         {
             _in_single_line_comment = false;
+            _single_line_comment_cache="";
             continue;
         }
 
-        if (_current_char == '[' && !_in_single_line_comment)
+        if (ch == '[' && !_in_single_line_comment)
         {
-            if (++_multiline_comment_enclosure_level > _owner->_enclosure_max_level)
+            if (++_multiline_comment_enclosure_level > _enclosure_max_level)
             {
                 throw std::invalid_argument(
                     "Multiline comment enclosure is too high!");
@@ -93,7 +99,7 @@ comments_handler::iterator & comments_handler::iterator::operator++()
             continue;
         }
 
-        if (_current_char == ']' && !_in_single_line_comment)
+        if (ch == ']' && !_in_single_line_comment)
         {
             if (--_multiline_comment_enclosure_level == -1)
             {
@@ -109,9 +115,9 @@ comments_handler::iterator & comments_handler::iterator::operator++()
         }
     }
 
-    if (_owner->_stream->eof())
+    if (_stream->eof())
     {
-        _owner = nullptr;
+        _stream = nullptr;
 
         if (_in_single_line_comment)
             _in_single_line_comment = false;
