@@ -5,10 +5,6 @@
 class interpreter
 {
 
-public:
-
-    static std::string const _default_variables_alphabet;
-
 private:
 
     enum lvalues_position_types
@@ -24,15 +20,36 @@ private:
         before_operation,
     };
 
+public:
+
+    static std::string const _default_variables_alphabet;
+
 private:
 
     trie<int> _variables;
-    size_t _base_assign = 10, _base_input=10, _base_output=10;
-    trie<std::function<int(std::vector<int>)>> _functions_map;
-    lvalues_position_types _lvalues_position = left;
-    arguments_position_types _arguments_position = after_operation;
+
+    trie<std::function<int(std::vector<int>)>> const _operations;
+    lvalues_position_types const _lvalues_position;
+    arguments_position_types const _arguments_position;
+    bool const _is_debug_mode_enabled;
+
+    size_t const _base_assign;
+    size_t const _base_input;
+    size_t const _base_output;
 
 
+
+public:
+
+    interpreter(
+        trie<std::function<int(std::vector<int>)>> const &_operations,
+        lvalues_position_types const & _lvalues_position,
+        arguments_position_types const & _arguments_position,
+        size_t const & _base_assign,
+        size_t const & _base_input,
+        size_t const & _base_output,
+        bool const & _is_debug_mode_enabled
+        );
 
 public:
 
