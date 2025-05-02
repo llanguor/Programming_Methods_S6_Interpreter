@@ -1,12 +1,25 @@
 #include "builder.hpp"
 
+#include <utility>
+
 interpreter::builder::builder(
     std::string const & settings_file_path,
-    int const enclosure_max_level,
-    std::string const & variables_alphabet):
+    int enclosure_max_level,
+    size_t base_assign,
+    size_t base_input,
+    size_t base_output,
+    bool is_debug,
+    std::string variables_alphabet,
+    std::string const & functions_alphabet):
+
+    _base_assign(base_assign),
+    _base_input(base_input),
+    _base_output(base_output),
+    _is_debug(is_debug),
     _stream(settings_file_path),
     _lexer(&_stream, enclosure_max_level, "[a-zA-Z0-9_]", "[\r\n\t ]+"),
-    _functions_map(variables_alphabet)
+    _variables_alphabet(std::move(variables_alphabet)),
+    _functions_map(functions_alphabet)
 {
     for (auto l : _lexer)
     {
@@ -19,6 +32,7 @@ interpreter::builder::builder(
 
     }
 }
+
 
 
 interpreter::builder & interpreter::builder::append_function(
@@ -35,7 +49,7 @@ interpreter::builder & interpreter::builder::append_function_map(
     for (auto const & it : functions_map)
     {
         _functions_map.upsert(
-            std::move(it->key),
+            it->key,
             std::move(it->value));
     }
     return *this;
