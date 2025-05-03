@@ -7,25 +7,55 @@
 #pragma region lexer
 
 lexer::lexer(
-    std::istream & stream,
+    std::istream * stream,
     size_t const & enclosure_max_level,
     std::string const & regex_separators,
     std::string const & regex_chars):
-    _stream(&stream),
+    _stream(stream),
     _enclosure_max_level(enclosure_max_level),
     _regex_chars(regex_chars),
     _regex_separators(regex_separators)
 {
 }
 
-lexer::lexeme_iterator lexer::begin() const
+lexer::iterator_base lexer::begin() const
 {
-    return lexer::lexeme_iterator(_stream, _enclosure_max_level, &_regex_chars, &_regex_separators);
+    return lexer::iterator_base(
+        _stream,
+        _enclosure_max_level,
+        &_regex_chars,
+        &_regex_separators,
+        true);
 }
 
-lexer::lexeme_iterator lexer::end() const
+lexer::iterator_base lexer::end() const
 {
-    return lexer::lexeme_iterator(nullptr, _enclosure_max_level, &_regex_chars, &_regex_separators);
+    return lexer::iterator_base(
+        nullptr,
+        _enclosure_max_level,
+        &_regex_chars,
+        &_regex_separators,
+        true);
+}
+
+lexer::iterator_base lexer::begin_string_only() const
+{
+    return lexer::iterator_base(
+    _stream,
+    _enclosure_max_level,
+    &_regex_chars,
+    &_regex_separators,
+    false);
+}
+
+lexer::iterator_base lexer::end_string_only() const
+{
+    return lexer::iterator_base(
+    nullptr,
+    _enclosure_max_level,
+    &_regex_chars,
+    &_regex_separators,
+    false);
 }
 
 #pragma endregion
@@ -33,18 +63,18 @@ lexer::lexeme_iterator lexer::end() const
 #pragma region iterator
 
 
-lexer::lexeme_iterator::lexeme_iterator(
+lexer::iterator_base::iterator_base(
     std::istream * stream,
     size_t const enclosure_max_level,
     std::regex const * regex_chars,
-    std::regex const * regex_separators):
-    _comments_handler(*stream, enclosure_max_level),
+    std::regex const * regex_separators,
+    bool const & control_chars_need_to_handle):
+    _comments_handler(stream, enclosure_max_level),
     _comments_handler_it(_comments_handler.begin()),
-    _regex_chars(regex_chars),
-    _regex_separators(regex_separators)
+    _regex_separators(regex_separators),
+    _regex_chars(regex_chars)
 {
-
-    if (!stream || _comments_handler_it == _comments_handler.end())
+    if (_comments_handler_it == _comments_handler.end())
     {
         _position = EOF;
     }
@@ -54,13 +84,13 @@ lexer::lexeme_iterator::lexeme_iterator(
     }
 }
 
-bool lexer::lexeme_iterator::operator==(lexeme_iterator const &other) const noexcept
+bool lexer::iterator_base::operator==(iterator_base const &other) const noexcept
 {
     return _position ==
         other._position;
 }
 
-std::variant<std::string, comments_handler::control_char_types> lexer::lexeme_iterator::operator*() const
+std::variant<std::string, comments_handler::control_char_types> lexer::iterator_base::operator*() const
 {
     if (_position==EOF)
         throw std::out_of_range("Attempt to dereference end-iterator");
@@ -68,7 +98,7 @@ std::variant<std::string, comments_handler::control_char_types> lexer::lexeme_it
     return _current_value;
 }
 
-lexer::lexeme_iterator & lexer::lexeme_iterator::operator++()
+lexer::iterator_base & lexer::iterator_base::operator++()
 {
     std::string lexeme;
     ++_position;
@@ -117,9 +147,9 @@ lexer::lexeme_iterator & lexer::lexeme_iterator::operator++()
     return *this;
 }
 
-lexer::lexeme_iterator lexer::lexeme_iterator::operator++(int not_used)
+lexer::iterator_base lexer::iterator_base::operator++(int not_used)
 {
-    lexeme_iterator temp {*this};
+    iterator_base temp {*this};
     ++(*this);
     return temp;
 }

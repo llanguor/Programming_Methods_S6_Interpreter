@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <fstream>
+#include <map>
 #include <variant>
 #include <sstream>
 
@@ -19,10 +20,12 @@ public:
         debug
     };
 
+    static std::map<std::string, control_char_types> const control_char_types_map;
+
 public:
 
     comments_handler(
-        std::istream & stream,
+        std::istream * stream,
         size_t const & enclosure_max_level);
 
 public:
@@ -32,7 +35,8 @@ public:
     private:
 
         std::istream * _stream;
-        int _enclosure_max_level;
+        int const _enclosure_max_level;
+        bool const _control_chars_need_to_handle;
 
         std::variant<int, control_char_types> _current_value = EOF;
         size_t _multiline_comment_enclosure_level = 0;
@@ -43,19 +47,22 @@ public:
 
         explicit control_char_iterator(
            std::istream * stream,
-           size_t const & enclosure_max_level);
+           size_t const & enclosure_max_level,
+           bool const & control_chars_need_to_handle = true);
 
     public:
 
         bool operator==(control_char_iterator const &other) const noexcept;
 
-        std::variant<int, control_char_types> operator*() const;
+        virtual std::variant<int, control_char_types> operator*() const;
 
         control_char_iterator &operator++();
 
         control_char_iterator operator++(int not_used);
 
+        virtual ~control_char_iterator() = default;
     };
+
 
     class char_iterator
     {
@@ -65,22 +72,21 @@ public:
 
     public:
 
-        explicit char_iterator(
-           std::istream * stream,
-           size_t const & enclosure_max_level);
+        char_iterator(
+            std::istream *stream,
+            size_t const &enclosure_max_level);
 
-    public:
-
-        bool operator==(char_iterator const &other) const noexcept;
+        bool operator==(
+            char_iterator const &other) const noexcept;
 
         int operator*();
 
-        char_iterator &operator++();
+        char_iterator
+            & operator++();
 
-        char_iterator operator++(int not_used);
-
+        char_iterator
+            operator++(int not_used);
     };
-
 
 public:
 
@@ -88,7 +94,7 @@ public:
 
     [[nodiscard]] control_char_iterator end() const;
 
-    [[nodiscard]] char_iterator begin_char() const;
+    [[nodiscard]] char_iterator begin_char_only() const;
 
-    [[nodiscard]] char_iterator end_char() const;
+    [[nodiscard]] char_iterator end_char_only() const;
 };

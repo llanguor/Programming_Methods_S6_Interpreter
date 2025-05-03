@@ -22,10 +22,10 @@ int main()
     .append_function_map(functions_trie)
     .build();
 
-    std::stringstream ss1 ("asdas#DEBUG\n");
-    comments_handler asd (ss1, 1);
-    auto it = asd.begin_char();
-    while (it!=asd.end_char())
+    std::stringstream ss1 ("asdas#DEBUGd\nd");
+    comments_handler asd (&ss1, 1);
+    auto it = asd.begin_char_only();
+    while (it!=asd.end_char_only())
     {
         auto aaaa = *it;
         std::cout << static_cast<char>( aaaa);

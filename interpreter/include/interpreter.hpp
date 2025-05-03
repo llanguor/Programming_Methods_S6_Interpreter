@@ -5,7 +5,7 @@
 #include "lexer.hpp"
 
 
-//todo: add comments everywhere. get used to writing
+//todo: add comments everywhere. get used to writing. also use built-in method definitions
 
 class interpreter
 {

@@ -1,13 +1,24 @@
 #include "comments_handler.hpp"
+#include "comments_handler.hpp"
+#include "comments_handler.hpp"
 
 #include <iostream>
+
+#pragma region static_fields
+
+std::map<std::string,  comments_handler::control_char_types> const comments_handler::control_char_types_map =
+{
+    { "DEBUG", comments_handler::control_char_types::debug }
+};
+
+#pragma endregion
 
 #pragma region comments_handler
 
 comments_handler::comments_handler(
-    std::istream & stream,
+    std::istream * stream,
     size_t const & enclosure_max_level):
-    _stream(&stream),
+    _stream(stream),
     _enclosure_max_level(enclosure_max_level)
 {
 }
@@ -22,12 +33,12 @@ comments_handler::control_char_iterator comments_handler::end() const
     return comments_handler::control_char_iterator(nullptr, _enclosure_max_level);
 }
 
-comments_handler::char_iterator comments_handler::begin_char() const
+comments_handler::char_iterator comments_handler::begin_char_only() const
 {
     return comments_handler::char_iterator(_stream, _enclosure_max_level);
 }
 
-comments_handler::char_iterator comments_handler::end_char() const
+comments_handler::char_iterator comments_handler::end_char_only() const
 {
     return comments_handler::char_iterator(nullptr, _enclosure_max_level);
 }
@@ -39,9 +50,11 @@ comments_handler::char_iterator comments_handler::end_char() const
 
 comments_handler::control_char_iterator::control_char_iterator(
     std::istream * stream,
-    size_t const & enclosure_max_level):
+    size_t const & enclosure_max_level,
+    bool const & control_chars_need_to_handle):
     _stream(stream),
-    _enclosure_max_level(enclosure_max_level)
+    _enclosure_max_level(enclosure_max_level),
+    _control_chars_need_to_handle(control_chars_need_to_handle)
 {
     if (!_stream || !*_stream)
     {
@@ -79,13 +92,14 @@ comments_handler::control_char_iterator & comments_handler::control_char_iterato
     {
         _current_value = ch;
 
-        if (_in_single_line_comment)
+        if (_in_single_line_comment && _control_chars_need_to_handle)
         {
             _single_line_comment_cache+=ch;
 
-            if (_single_line_comment_cache == "DEBUG")
+            if (control_char_types_map.contains(
+                _single_line_comment_cache))
             {
-                _current_value = comments_handler::control_char_types::debug;
+                _current_value = control_char_types_map.at(_single_line_comment_cache);
                 return *this;
             }
         }
@@ -158,12 +172,14 @@ comments_handler::control_char_iterator comments_handler::control_char_iterator:
 
 #pragma endregion
 
+
+
 #pragma region char_iterator
 
 comments_handler::char_iterator::char_iterator(
     std::istream *stream,
     size_t const &enclosure_max_level):
-    _it(stream, enclosure_max_level)
+    _it(stream, enclosure_max_level, false)
 {
 }
 
@@ -181,6 +197,7 @@ int comments_handler::char_iterator::operator*()
 comments_handler::char_iterator
     & comments_handler::char_iterator::operator++()
 {
+    /*
     try
     {
         while (
@@ -196,7 +213,8 @@ comments_handler::char_iterator
         //or create class field "it_end" and init from constructor
         //it's bad: code dependency
     }
-
+*/
+    _it.operator++();
     return *this;
 }
 
@@ -210,3 +228,4 @@ comments_handler::char_iterator
 
 
 #pragma endregion
+
