@@ -47,6 +47,7 @@ private:
 private:
 
     trie<int> _variables;
+    std::string const _instructions_alphabet = R"([A-Za-z0-9!#$%&'()*+,-./:<=>?@[\]^_`{|}~])";
 
 public:
 
@@ -93,6 +94,12 @@ public:
     size_t const & base_assign,
     size_t const & base_input,
     size_t const & base_output);
+
+    std::string const expresion_to_reverse_polish_notation(
+        std::string const & input);
+
+    void execute_sequence_of_functions(
+        std::string const & input);
 
 public:
 

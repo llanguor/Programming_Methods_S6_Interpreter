@@ -10,6 +10,16 @@ interpreter::builder::builder(
     _stream(settings_file_path),
     _operations_map(operations_alphabet)
 {
+    if (!_stream.is_open())
+    {
+        throw std::runtime_error("Failed to open file: " + settings_file_path +
+                            ". File might not exist or you do not have permission to read it.");
+    }
+
+    if (_stream.fail())
+    {
+        throw std::runtime_error("Stream operation failed: either the file could not be read or the data could not be extracted.");
+    }
 }
 
 interpreter::builder::builder(

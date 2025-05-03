@@ -11,17 +11,55 @@ lexer::lexer(
     size_t const & enclosure_max_level,
     std::string const & regex_separators,
     std::string const & regex_chars):
-    _stream(stream),
+    _stream_ptr(stream),
     _enclosure_max_level(enclosure_max_level),
     _regex_chars(regex_chars),
     _regex_separators(regex_separators)
 {
+    if (_stream_ptr->fail())
+    {
+        throw std::runtime_error("Stream operation failed: either the file could not be read or the data could not be extracted.");
+    }
 }
+
+lexer::lexer(
+    std::string const &str,
+    size_t const &enclosure_max_level,
+    std::string const &regex_separators,
+    std::string const &regex_chars,
+    bool const &is_file):
+    _enclosure_max_level(enclosure_max_level),
+    _regex_chars(regex_chars),
+    _regex_separators(regex_separators)
+{
+    if (is_file)
+    {
+        _stream = make_unique<std::ifstream>(str);
+        if (!dynamic_cast<std::ifstream *>(&*_stream)->is_open())
+        {
+            throw std::runtime_error("Failed to open file: " + str +
+                                ". File might not exist or you do not have permission to read it.");
+        }
+    }
+    else
+    {
+        _stream = make_unique<std::stringstream>(str);
+    }
+
+
+    if (_stream->fail())
+    {
+        throw std::runtime_error("Stream operation failed: either the file could not be read or the data could not be extracted.");
+    }
+
+    _stream_ptr = &*_stream;
+}
+
 
 lexer::lexeme_iterator lexer::begin() const
 {
     return lexer::lexeme_iterator(
-        _stream,
+        _stream_ptr,
         _enclosure_max_level,
         &_regex_chars,
         &_regex_separators);
@@ -39,7 +77,7 @@ lexer::lexeme_iterator lexer::end() const
 lexer::lexeme_string_only_iterator lexer::begin_string_only() const
 {
     return lexer::lexeme_string_only_iterator(
-    _stream,
+    _stream_ptr,
     _enclosure_max_level,
     &_regex_chars,
     &_regex_separators);
@@ -112,17 +150,17 @@ lexer::lexeme_iterator & lexer::lexeme_iterator::operator++()
         const char current_char = static_cast<char>(std::get<int>(current_char_value));
         std::string str(1, current_char);
 
-        if (std::regex_match(str, *_regex_chars))
-        {
-            lexeme += current_char;
-        }
-        else if (std::regex_match(str, *_regex_separators))
+        if (std::regex_match(str, *_regex_separators))
         {
             if (!lexeme.empty())
             {
                 _current_value = lexeme;
                 return *this;
             }
+        }
+        else if (std::regex_match(str, *_regex_chars))
+        {
+            lexeme += current_char;
         }
         else
         {

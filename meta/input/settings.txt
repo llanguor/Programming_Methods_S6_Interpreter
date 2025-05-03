@@ -1,4 +1,4 @@
-right= #comment
+left= #comment
 (op)
 add sum
 div /

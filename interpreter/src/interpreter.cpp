@@ -81,7 +81,77 @@ void interpreter::run(
     size_t const &base_input,
     size_t const &base_output)
 {
-    // lexer _lexer;
+    std::cout<<" "<<std::endl;
+
+
+    lexer _lexer_instruction(
+        program_file_path,
+        _comments_enclosure_max_level,
+        R"(;)",
+        _instructions_alphabet,
+        true);
+
+    int line_number = 0;
+    for (auto const & value : _lexer_instruction)
+    {
+        if (std::holds_alternative<comments_handler::control_char_types>(value))
+        {
+            switch (std::get<comments_handler::control_char_types>(value))
+            {
+                case comments_handler::control_char_types::debug:
+                    //debug mode
+                    break;
+            }
+            continue;
+        }
+
+
+        auto line = std::get<std::string>(value);
+       // std::cout << "INSTRUCTION: [" <<line << "]" << std::endl;
+
+
+        std::string variable_to_assign, expression_str;
+
+        try
+        {
+            lexer _lexer_assignment(
+            line,
+            _comments_enclosure_max_level,
+            R"(=)",
+            _instructions_alphabet,
+            false);
+
+            auto _lexer_assignment_it = _lexer_assignment.begin_string_only();
+            variable_to_assign = *_lexer_assignment_it;
+            expression_str = *++_lexer_assignment_it;
+
+            if (_lvalues_position == interpreter::right)
+            {
+                std::swap(variable_to_assign, expression_str);
+            }
+        }
+        catch (std::out_of_range e)
+        {
+            throw std::runtime_error("Invalid content in program file on line " + std::to_string(line_number));
+        }
+
+        std::cout<<"VARIABLE: "<< variable_to_assign <<std::endl;
+        std::cout<<"EXPRESSION: "<< expression_str <<std::endl;
+        ++line_number;
+
+        auto result = expresion_to_reverse_polish_notation(expression_str);
+
+        execute_sequence_of_functions(result);
+    }
+}
+
+std::string const interpreter::expresion_to_reverse_polish_notation(std::string const &input)
+{
+    return input;
+}
+
+void interpreter::execute_sequence_of_functions(std::string const &input)
+{
 }
 
 #pragma endregion

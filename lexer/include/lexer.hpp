@@ -12,18 +12,26 @@ public:
 
 private:
 
-    std::istream * _stream;
+    std::unique_ptr<std::istream> _stream;
+    std::istream * _stream_ptr;
     size_t const _enclosure_max_level;
     std::regex const _regex_chars;
     std::regex const _regex_separators;
 
 public:
 
-    explicit lexer(
+    lexer(
        std::istream * stream,
        size_t const & enclosure_max_level,
        std::string const & regex_separators,
        std::string const & regex_chars);
+
+    lexer(
+    std::string const &str,
+       size_t const & enclosure_max_level,
+       std::string const & regex_separators,
+       std::string const & regex_chars,
+       bool const & is_file);
 
 
 public:

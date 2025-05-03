@@ -14,14 +14,18 @@
 
 int main()
 {
-    const auto settings_path = "../meta/input/settings.txt";
+    std::string const path = "../meta/input/";
+
     auto functions_trie = operations::get_functions_trie();
 
     auto interpreter =
-        interpreter::builder(settings_path)
+        interpreter::builder(path+"settings.txt")
     .append_function_map(functions_trie)
     .build();
 
+    interpreter->run(path+"program1.txt");
+
+    delete interpreter;
     /*
     std::stringstream ss1 ("asdas#DEBUGd\nd");
     comments_handler asd (&ss1, 1);
@@ -34,8 +38,8 @@ int main()
     }
     */
 
-    std::stringstream ss2 ("asd as #DEBUGd\nd");
-    lexer lex (&ss2, 1,R"([\r\n\t ]+)",R"([^\r\n\t ])");
+    /*
+    lexer lex (settings_path, 1,R"([\r\n\t ]+)",R"([^\r\n\t ])", true);
     auto it = lex.begin_string_only();
     while (it!=lex.end_string_only())
     {
@@ -43,6 +47,7 @@ int main()
         std::cout <<  aaaa << " ";
         ++it;
     }
+    */
     return 0;
 }
 
