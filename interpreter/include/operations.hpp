@@ -52,7 +52,4 @@ public:
 
     static int _or(std::vector<int> const &argv);
 
-    static int assignment(std::vector<int> const &argv);
-
-
 };

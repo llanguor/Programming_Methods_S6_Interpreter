@@ -35,7 +35,6 @@ operations::get_functions_trie(
     functions_trie.upsert("xor", operations::_xor);
     functions_trie.upsert("and", operations::_and);
     functions_trie.upsert("or", operations::_or);
-    functions_trie.upsert("=", operations::assignment);
     return functions_trie;
 }
 
@@ -217,11 +216,6 @@ int operations::_or(std::vector<int> const &argv)
 {
     throw_if_unexpected_size(argv.size(), 2);
     return argv[0] | argv[1];
-}
-
-int operations::assignment(std::vector<int> const &argv)
-{
-    return 0;
 }
 
 #pragma endregion
