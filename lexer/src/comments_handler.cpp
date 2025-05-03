@@ -6,7 +6,7 @@
 
 comments_handler::comments_handler(
     std::istream * stream,
-    int const enclosure_max_level):
+    size_t const & enclosure_max_level):
     _stream(stream),
     _enclosure_max_level(enclosure_max_level)
 {
@@ -28,7 +28,7 @@ comments_handler::iterator comments_handler::end() const
 
 comments_handler::iterator::iterator(
     std::istream * stream,
-    int const enclosure_max_level):
+    size_t const & enclosure_max_level):
     _stream(stream),
     _enclosure_max_level(enclosure_max_level)
 {

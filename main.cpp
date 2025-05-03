@@ -14,15 +14,14 @@
 
 int main()
 {
-    auto settings_path = "../meta/input/settings.txt";
+    const auto settings_path = "../meta/input/settings.txt";
     auto functions_trie = operations::get_functions_trie();
 
     auto interpreter =
         interpreter::builder(settings_path)
-        .append_function_map(functions_trie)
-        .check_function("div");
+    .append_function_map(functions_trie)
+    .build();
 
-    std::cout<<interpreter;
     return 0;
 }
 

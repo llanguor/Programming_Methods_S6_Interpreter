@@ -8,9 +8,9 @@
 
 lexer::lexer(
     std::istream * stream,
-    int const enclosure_max_level,
-    std::string const & regex_chars,
-    std::string const & regex_separators):
+    size_t const & enclosure_max_level,
+    std::string const & regex_separators,
+    std::string const & regex_chars):
     _stream(stream),
     _enclosure_max_level(enclosure_max_level),
     _regex_chars(regex_chars),
@@ -34,7 +34,7 @@ lexer::iterator lexer::end() const
 
 lexer::iterator::iterator(
     std::istream *stream,
-    int const enclosure_max_level,
+    size_t const enclosure_max_level,
     std::regex const * regex_chars,
     std::regex const * regex_separators):
     _comments_handler(stream, enclosure_max_level),

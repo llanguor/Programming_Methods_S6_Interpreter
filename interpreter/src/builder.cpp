@@ -42,31 +42,37 @@ interpreter::builder & interpreter::builder::append_function_map(
     return *this;
 }
 
-interpreter::builder & interpreter::builder::set_base_assign(size_t base)
+interpreter::builder & interpreter::builder::set_base_assign(size_t const & base)
 {
     _base_assign = base;
     return *this;
 }
 
-interpreter::builder & interpreter::builder::set_base_input(size_t base)
+interpreter::builder & interpreter::builder::set_base_input(size_t const & base)
 {
     _base_input = base;
     return *this;
 }
 
-interpreter::builder & interpreter::builder::set_base_output(size_t base)
+interpreter::builder & interpreter::builder::set_base_output(size_t const & base)
 {
     _base_output = base;
     return *this;
 }
 
-interpreter::builder & interpreter::builder::set_debug_mode(bool is_debug_mode_enabled)
+interpreter::builder & interpreter::builder::set_comments_enclosure_max_level(size_t const & max_level)
+{
+    _comments_enclosure_max_level = max_level;
+    return *this;
+}
+
+interpreter::builder & interpreter::builder::set_debug_mode(bool const & is_debug_mode_enabled)
 {
     _is_debug_mode_enabled = is_debug_mode_enabled;
     return *this;
 }
 
-interpreter::builder & interpreter::builder::set_variables_alphabet(std::string const &alphabet)
+interpreter::builder & interpreter::builder::set_variables_alphabet(std::string const & alphabet)
 {
     _variables_alphabet = alphabet;
     return *this;
@@ -76,30 +82,72 @@ interpreter::builder & interpreter::builder::set_variables_alphabet(std::string 
 
 #pragma region methods
 
-int interpreter::builder::check_function(
-    std::string const &original_name)
+interpreter * interpreter::builder::build()
 {
-    return _operations_map.obtain(original_name)({2,3});;
-}
-
-interpreter const * interpreter::builder::build() const
-{
+    //std::cout << _operations_map.obtain(original_name)({2,3});
 
     //parse operations_map, lvalues_position, arguments_position
     //make all arguments as reference
 
-        /*
-    for (auto l : _lexer)
+    lexer lexer( &_stream,
+        _comments_enclosure_max_level,
+        R"([\r\n\t ]+)",
+        R"([^\r\n\t ])");
+
+    std::string edit_operations_name;
+
+    for (auto value : lexer)
     {
-        if (std::holds_alternative<lexer::control_char_types>(l))
+        if (std::holds_alternative<lexer::control_char_types>(value))
         {
-            throw std::invalid_argument("the use of control codes is not supported in the context of a settings file");
+            continue; //throw std::invalid_argument("the use of control codes is not supported in the context of a settings file");
         }
 
-        std::cout << std::get<std::string>(l) <<" ";
+        auto lexeme = std::get<std::string>(value);
+        std::cout << lexeme <<" ";
 
+        /*
+        if (lexeme=="left=")
+        {
+            _lvalues_position = interpreter::left;
+        }
+        else if (lexeme=="right=")
+        {
+            _lvalues_position = interpreter::right;
+        }
+        else if (lexeme=="op()")
+        {
+            _arguments_position = interpreter::after_operation;
+        }
+        else if (lexeme=="()op")
+        {
+            _arguments_position = interpreter::before_operation;
+        }
+        else if (lexeme=="")
+        {
+            _arguments_position = interpreter::around_operation;
+        }
+        else
+        {
+            if (edit_operations_name.empty())
+            {
+                edit_operations_name = lexeme;
+            }
+            else
+            {
+                auto operation_func = _operations_map.obtain(edit_operations_name);
+                _operations_map.dispose(edit_operations_name);
+                _operations_map.upsert(edit_operations_name, std::move(operation_func));
+                edit_operations_name.clear();
+            }
+        }
+        */
     }
-    */
+
+    if (!edit_operations_name.empty())
+    {
+        throw std::invalid_argument("The provided settings file contains invalid syntax.");
+    }
 
     return new interpreter(
         _operations_map,
@@ -108,7 +156,8 @@ interpreter const * interpreter::builder::build() const
         _base_assign,
         _base_input,
         _base_output,
-        _is_debug_mode_enabled
+        _is_debug_mode_enabled,
+        _variables_alphabet
         );
 }
 

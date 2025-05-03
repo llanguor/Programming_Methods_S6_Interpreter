@@ -1,3 +1,6 @@
-ashdbb
-sdasdsad
-asds
+right= #comment
+(op)
+add sum
+div /
+rem %
+#= ->

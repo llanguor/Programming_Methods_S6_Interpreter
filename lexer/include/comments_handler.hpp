@@ -10,7 +10,7 @@ class comments_handler
 private:
 
     std::istream * _stream;
-    int const _enclosure_max_level;
+    size_t const _enclosure_max_level;
 
 public:
 
@@ -23,7 +23,7 @@ public:
 
     comments_handler(
         std::istream * stream,
-        int enclosure_max_level);
+        size_t const & enclosure_max_level);
 
 public:
 
@@ -35,7 +35,7 @@ public:
         int _enclosure_max_level;
 
         std::variant<int, control_char_types> _current_value = EOF;
-        int _multiline_comment_enclosure_level = 0;
+        size_t _multiline_comment_enclosure_level = 0;
         bool _in_single_line_comment = false;
         std::string _single_line_comment_cache;
 
@@ -43,7 +43,7 @@ public:
 
         explicit iterator(
            std::istream * stream,
-           int enclosure_max_level);
+           size_t const & enclosure_max_level);
 
     public:
 
