@@ -89,7 +89,7 @@ interpreter * interpreter::builder::build()
     //parse operations_map, lvalues_position, arguments_position
     //make all arguments as reference
 
-    lexer lexer( &_stream,
+    lexer lexer( _stream,
         _comments_enclosure_max_level,
         R"([\r\n\t ]+)",
         R"([^\r\n\t ])");
@@ -153,6 +153,7 @@ interpreter * interpreter::builder::build()
         _operations_map,
         _lvalues_position,
         _arguments_position,
+        _comments_enclosure_max_level,
         _base_assign,
         _base_input,
         _base_output,

@@ -5,28 +5,39 @@
 #pragma region comments_handler
 
 comments_handler::comments_handler(
-    std::istream * stream,
+    std::istream & stream,
     size_t const & enclosure_max_level):
-    _stream(stream),
+    _stream(&stream),
     _enclosure_max_level(enclosure_max_level)
 {
 }
 
-comments_handler::iterator comments_handler::begin() const
+comments_handler::control_char_iterator comments_handler::begin() const
 {
-    return comments_handler::iterator(_stream, _enclosure_max_level);
+    return comments_handler::control_char_iterator(_stream, _enclosure_max_level);
 }
 
-comments_handler::iterator comments_handler::end() const
+comments_handler::control_char_iterator comments_handler::end() const
 {
-    return comments_handler::iterator(nullptr, _enclosure_max_level);
+    return comments_handler::control_char_iterator(nullptr, _enclosure_max_level);
 }
+
+comments_handler::char_iterator comments_handler::begin_char() const
+{
+    return comments_handler::char_iterator(_stream, _enclosure_max_level);
+}
+
+comments_handler::char_iterator comments_handler::end_char() const
+{
+    return comments_handler::char_iterator(nullptr, _enclosure_max_level);
+}
+
 
 #pragma endregion
 
-#pragma region iterator
+#pragma region control_char_iterator
 
-comments_handler::iterator::iterator(
+comments_handler::control_char_iterator::control_char_iterator(
     std::istream * stream,
     size_t const & enclosure_max_level):
     _stream(stream),
@@ -42,7 +53,7 @@ comments_handler::iterator::iterator(
     }
 }
 
-bool comments_handler::iterator::operator==(iterator const &other) const noexcept
+bool comments_handler::control_char_iterator::operator==(control_char_iterator const &other) const noexcept
 {
     return
         _stream==nullptr && other._stream==nullptr ||
@@ -50,7 +61,7 @@ bool comments_handler::iterator::operator==(iterator const &other) const noexcep
             _stream->tellg() == other._stream->tellg());
 }
 
-std::variant<int, comments_handler::control_char_types> comments_handler::iterator::operator*() const
+std::variant<int, comments_handler::control_char_types> comments_handler::control_char_iterator::operator*() const
 {
     if (_stream==nullptr)
         throw std::out_of_range("Attempt to dereference end-iterator");
@@ -58,7 +69,7 @@ std::variant<int, comments_handler::control_char_types> comments_handler::iterat
     return _current_value;
 }
 
-comments_handler::iterator & comments_handler::iterator::operator++()
+comments_handler::control_char_iterator & comments_handler::control_char_iterator::operator++()
 {
     if (_stream==nullptr)
         return *this;
@@ -138,13 +149,64 @@ comments_handler::iterator & comments_handler::iterator::operator++()
     return *this;
 }
 
-comments_handler::iterator comments_handler::iterator::operator++(int not_used)
+comments_handler::control_char_iterator comments_handler::control_char_iterator::operator++(int not_used)
 {
-    iterator temp {*this};
+    control_char_iterator temp {*this};
     ++(*this);
     return temp;
 }
 
 #pragma endregion
 
+#pragma region char_iterator
 
+comments_handler::char_iterator::char_iterator(
+    std::istream *stream,
+    size_t const &enclosure_max_level):
+    _it(stream, enclosure_max_level)
+{
+}
+
+bool comments_handler::char_iterator::operator==(
+    char_iterator const &other) const noexcept
+{
+    return _it.operator==(other._it);
+}
+
+int comments_handler::char_iterator::operator*()
+{
+    return std::get<int>(_it.operator*());
+}
+
+comments_handler::char_iterator
+    & comments_handler::char_iterator::operator++()
+{
+    try
+    {
+        while (
+            std::holds_alternative<comments_handler::control_char_types>(
+                *++_it))
+        {
+
+        }
+    }
+    catch (std::out_of_range e)
+    {
+        //here char_iterator end
+        //or create class field "it_end" and init from constructor
+        //it's bad: code dependency
+    }
+
+    return *this;
+}
+
+comments_handler::char_iterator
+    comments_handler::char_iterator::operator++(int not_used)
+{
+    char_iterator temp {*this};
+    ++(*this);
+    return temp;
+}
+
+
+#pragma endregion

@@ -22,12 +22,12 @@ public:
 public:
 
     comments_handler(
-        std::istream * stream,
+        std::istream & stream,
         size_t const & enclosure_max_level);
 
 public:
 
-    class iterator
+    class control_char_iterator
     {
     private:
 
@@ -41,26 +41,54 @@ public:
 
     public:
 
-        explicit iterator(
+        explicit control_char_iterator(
            std::istream * stream,
            size_t const & enclosure_max_level);
 
     public:
 
-        bool operator==(iterator const &other) const noexcept;
+        bool operator==(control_char_iterator const &other) const noexcept;
 
         std::variant<int, control_char_types> operator*() const;
 
-        iterator &operator++();
+        control_char_iterator &operator++();
 
-        iterator operator++(int not_used);
+        control_char_iterator operator++(int not_used);
 
     };
 
+    class char_iterator
+    {
+    private:
+
+        control_char_iterator _it;
+
+    public:
+
+        explicit char_iterator(
+           std::istream * stream,
+           size_t const & enclosure_max_level);
+
+    public:
+
+        bool operator==(char_iterator const &other) const noexcept;
+
+        int operator*();
+
+        char_iterator &operator++();
+
+        char_iterator operator++(int not_used);
+
+    };
+
+
 public:
 
-    [[nodiscard]] iterator begin() const;
+    [[nodiscard]] control_char_iterator begin() const;
 
-    [[nodiscard]] iterator end() const;
+    [[nodiscard]] control_char_iterator end() const;
 
+    [[nodiscard]] char_iterator begin_char() const;
+
+    [[nodiscard]] char_iterator end_char() const;
 };

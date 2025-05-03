@@ -20,7 +20,7 @@ private:
 public:
 
     explicit lexer(
-       std::istream * stream,
+       std::istream & stream,
        size_t const & enclosure_max_level,
        std::string const & regex_separators,
        std::string const & regex_chars);
@@ -28,13 +28,13 @@ public:
 
 public:
 
-    class iterator
+    class lexeme_iterator
     {
 
     private:
 
         comments_handler _comments_handler;
-        comments_handler::iterator _comments_handler_it;
+        comments_handler::control_char_iterator _comments_handler_it;
         std::variant<std::string, comments_handler::control_char_types> _current_value;
         int _position=0;
         std::regex const * _regex_separators;
@@ -42,7 +42,7 @@ public:
 
     public:
 
-        explicit iterator(
+        explicit lexeme_iterator(
            std::istream * stream,
            size_t enclosure_max_level,
            std::regex const * regex_chars,
@@ -50,19 +50,19 @@ public:
 
     public:
 
-        bool operator==(iterator const &other) const noexcept;
+        bool operator==(lexeme_iterator const &other) const noexcept;
 
         std::variant<std::string, comments_handler::control_char_types> operator*() const;
 
-        iterator &operator++();
+        lexeme_iterator &operator++();
 
-        iterator operator++(int not_used);
+        lexeme_iterator operator++(int not_used);
     };
 
 public:
 
-    [[nodiscard]] iterator begin() const;
+    [[nodiscard]] lexeme_iterator begin() const;
 
-    [[nodiscard]] iterator end() const;
+    [[nodiscard]] lexeme_iterator end() const;
 
 };
