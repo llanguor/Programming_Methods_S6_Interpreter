@@ -4,7 +4,7 @@
 
 #pragma region operations_class implementation
 
-std::string const operations::_default_operations_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_=";
+std::string const operations::_default_operations_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_=/%<>-";
 
 void operations::throw_if_unexpected_size(
     unsigned long long const & current_size,

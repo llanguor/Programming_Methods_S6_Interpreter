@@ -104,9 +104,9 @@ interpreter * interpreter::builder::build()
         }
 
         auto lexeme = std::get<std::string>(value);
-        std::cout << lexeme <<" ";
+        std::cout << lexeme << " ";
 
-        /*
+
         if (lexeme=="left=")
         {
             _lvalues_position = interpreter::left;
@@ -123,7 +123,7 @@ interpreter * interpreter::builder::build()
         {
             _arguments_position = interpreter::before_operation;
         }
-        else if (lexeme=="")
+        else if (lexeme=="(op)")
         {
             _arguments_position = interpreter::around_operation;
         }
@@ -137,11 +137,11 @@ interpreter * interpreter::builder::build()
             {
                 auto operation_func = _operations_map.obtain(edit_operations_name);
                 _operations_map.dispose(edit_operations_name);
-                _operations_map.upsert(edit_operations_name, std::move(operation_func));
+                _operations_map.upsert(lexeme, std::move(operation_func));
                 edit_operations_name.clear();
             }
         }
-        */
+
     }
 
     if (!edit_operations_name.empty())
