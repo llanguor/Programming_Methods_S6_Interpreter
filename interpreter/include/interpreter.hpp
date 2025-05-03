@@ -5,10 +5,7 @@
 #include "lexer.hpp"
 
 
-//возможно потребуется создать lexer. Тогда хранить его в ПОЛЕ
-//передавать в этот конструктор параметры для создания
-//создавать должен КОНСТРУКТОР
-
+//todo: add comments everywhere. get used to writing
 
 class interpreter
 {

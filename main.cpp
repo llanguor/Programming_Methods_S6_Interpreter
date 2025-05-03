@@ -22,7 +22,7 @@ int main()
     .append_function_map(functions_trie)
     .build();
 
-    std::stringstream ss1 ("asdas#DEBUG\nj");
+    std::stringstream ss1 ("asdas#DEBUG\n");
     comments_handler asd (ss1, 1);
     auto it = asd.begin_char();
     while (it!=asd.end_char())
