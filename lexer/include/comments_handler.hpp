@@ -36,7 +36,6 @@ public:
 
         std::istream * _stream;
         int const _enclosure_max_level;
-        bool const _control_chars_need_to_handle;
 
         std::variant<int, control_char_types> _current_value = EOF;
         size_t _multiline_comment_enclosure_level = 0;
@@ -47,8 +46,7 @@ public:
 
         explicit control_char_iterator(
            std::istream * stream,
-           size_t const & enclosure_max_level,
-           bool const & control_chars_need_to_handle = true);
+           size_t const & enclosure_max_level);
 
     public:
 

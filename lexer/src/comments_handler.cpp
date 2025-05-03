@@ -50,11 +50,9 @@ comments_handler::char_iterator comments_handler::end_char_only() const
 
 comments_handler::control_char_iterator::control_char_iterator(
     std::istream * stream,
-    size_t const & enclosure_max_level,
-    bool const & control_chars_need_to_handle):
+    size_t const & enclosure_max_level):
     _stream(stream),
-    _enclosure_max_level(enclosure_max_level),
-    _control_chars_need_to_handle(control_chars_need_to_handle)
+    _enclosure_max_level(enclosure_max_level)
 {
     if (!_stream || !*_stream)
     {
@@ -92,7 +90,7 @@ comments_handler::control_char_iterator & comments_handler::control_char_iterato
     {
         _current_value = ch;
 
-        if (_in_single_line_comment && _control_chars_need_to_handle)
+        if (_in_single_line_comment)
         {
             _single_line_comment_cache+=ch;
 
@@ -179,7 +177,7 @@ comments_handler::control_char_iterator comments_handler::control_char_iterator:
 comments_handler::char_iterator::char_iterator(
     std::istream *stream,
     size_t const &enclosure_max_level):
-    _it(stream, enclosure_max_level, false)
+    _it(stream, enclosure_max_level)
 {
 }
 
@@ -197,7 +195,7 @@ int comments_handler::char_iterator::operator*()
 comments_handler::char_iterator
     & comments_handler::char_iterator::operator++()
 {
-    /*
+
     try
     {
         while (
@@ -213,8 +211,7 @@ comments_handler::char_iterator
         //or create class field "it_end" and init from constructor
         //it's bad: code dependency
     }
-*/
-    _it.operator++();
+
     return *this;
 }
 
