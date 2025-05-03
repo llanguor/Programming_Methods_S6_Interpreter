@@ -84,8 +84,6 @@ interpreter::builder & interpreter::builder::set_variables_alphabet(std::string 
 
 interpreter * interpreter::builder::build()
 {
-    //std::cout << _operations_map.obtain(original_name)({2,3});
-
     //parse operations_map, lvalues_position, arguments_position
     //make all arguments as reference
 
@@ -96,34 +94,31 @@ interpreter * interpreter::builder::build()
 
     std::string edit_operations_name;
 
-    for (auto value : lexer)
+    for (auto lexeme = lexer.begin_string_only();
+        lexeme != lexer.end_string_only();
+        ++lexeme)
     {
-        if (std::holds_alternative<lexer::control_char_types>(value))
-        {
-            continue; //throw std::invalid_argument("the use of control codes is not supported in the context of a settings file");
-        }
-
-        auto lexeme = std::get<std::string>(value);
-        std::cout << lexeme << " ";
+        auto lexeme_str = *lexeme;
+        std::cout << lexeme_str << " ";
 
 
-        if (lexeme=="left=")
+        if (lexeme_str=="left=")
         {
             _lvalues_position = interpreter::left;
         }
-        else if (lexeme=="right=")
+        else if (lexeme_str=="right=")
         {
             _lvalues_position = interpreter::right;
         }
-        else if (lexeme=="op()")
+        else if (lexeme_str=="op()")
         {
             _arguments_position = interpreter::after_operation;
         }
-        else if (lexeme=="()op")
+        else if (lexeme_str=="()op")
         {
             _arguments_position = interpreter::before_operation;
         }
-        else if (lexeme=="(op)")
+        else if (lexeme_str=="(op)")
         {
             _arguments_position = interpreter::around_operation;
         }
@@ -131,13 +126,13 @@ interpreter * interpreter::builder::build()
         {
             if (edit_operations_name.empty())
             {
-                edit_operations_name = lexeme;
+                edit_operations_name = lexeme_str;
             }
             else
             {
                 auto operation_func = _operations_map.obtain(edit_operations_name);
                 _operations_map.dispose(edit_operations_name);
-                _operations_map.upsert(lexeme, std::move(operation_func));
+                _operations_map.upsert(lexeme_str, std::move(operation_func));
                 edit_operations_name.clear();
             }
         }

@@ -70,7 +70,7 @@ public:
 
     public:
 
-        char_iterator(
+        explicit char_iterator(
             std::istream *stream,
             size_t const &enclosure_max_level);
 

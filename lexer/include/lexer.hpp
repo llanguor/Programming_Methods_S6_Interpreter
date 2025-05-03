@@ -28,7 +28,7 @@ public:
 
 public:
 
-    class iterator_base
+    class lexeme_iterator
     {
 
     private:
@@ -42,32 +42,59 @@ public:
 
     public:
 
-        explicit iterator_base(
+        explicit lexeme_iterator(
            std::istream * stream,
            size_t enclosure_max_level,
            std::regex const * regex_chars,
-           std::regex const * regex_separators,
-           bool const & control_chars_need_to_handle);
+           std::regex const * regex_separators);
 
     public:
 
-        bool operator==(iterator_base const &other) const noexcept;
+        bool operator==(lexeme_iterator const &other) const noexcept;
 
         std::variant<std::string, comments_handler::control_char_types> operator*() const;
 
-        iterator_base &operator++();
+        lexeme_iterator &operator++();
 
-        iterator_base operator++(int not_used);
+        lexeme_iterator operator++(int not_used);
+    };
+
+
+    class lexeme_string_only_iterator
+    {
+
+    private:
+
+        lexeme_iterator _it;
+
+    public:
+
+        explicit lexeme_string_only_iterator(
+           std::istream * stream,
+           size_t enclosure_max_level,
+           std::regex const * regex_chars,
+           std::regex const * regex_separators);
+
+        bool operator==(
+            lexeme_string_only_iterator const &other) const noexcept;
+
+        std::string operator*();
+
+        lexeme_string_only_iterator
+            & operator++();
+
+        lexeme_string_only_iterator
+            operator++(int not_used);
     };
 
 public:
 
-    [[nodiscard]] iterator_base begin() const;
+    [[nodiscard]] lexeme_iterator begin() const;
 
-    [[nodiscard]] iterator_base end() const;
+    [[nodiscard]] lexeme_iterator end() const;
 
-    [[nodiscard]] iterator_base begin_string_only() const;
+    [[nodiscard]] lexeme_string_only_iterator begin_string_only() const;
 
-    [[nodiscard]] iterator_base end_string_only() const;
+    [[nodiscard]] lexeme_string_only_iterator end_string_only() const;
 
 };
