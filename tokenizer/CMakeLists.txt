@@ -9,13 +9,13 @@ file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS
 )
 
 if(SOURCES)
-    add_library(lexer ${SOURCES} ${HEADERS})
+    add_library(tokenizer ${SOURCES} ${HEADERS})
 else()
-    add_library(lexer ${HEADERS})
-    set_target_properties(lexer PROPERTIES LINKER_LANGUAGE CXX)
+    add_library(tokenizer ${HEADERS})
+    set_target_properties(tokenizer PROPERTIES LINKER_LANGUAGE CXX)
 endif()
 
 
-target_include_directories(lexer PUBLIC
+target_include_directories(tokenizer PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

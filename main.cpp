@@ -3,13 +3,12 @@
 #include <string>
 #include <memory>
 #include <sstream>
-
-#include "comments_handler.hpp"
-#include "lexer.hpp"
 #include<filesystem>
 #include "interpreter.hpp"
 #include "builder.hpp"
 #include "operations.hpp"
+#include "comments_handler.hpp"
+#include "tokenizer.hpp"
 
 
 int main()
@@ -40,9 +39,9 @@ int main()
     */
 
     /*
-    lexer lex (settings_path, 1,R"([\r\n\t ]+)",R"([^\r\n\t ])", true);
-    auto it = lex.begin_string_only();
-    while (it!=lex.end_string_only())
+    tokenizer tok (settings_path, 1,R"([\r\n\t ]+)",R"([^\r\n\t ])", true);
+    auto it = tok.begin_string_only();
+    while (it!=tok.end_string_only())
     {
         auto aaaa = *it;
         std::cout <<  aaaa << " ";

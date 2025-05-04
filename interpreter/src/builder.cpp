@@ -1,7 +1,5 @@
 #include "builder.hpp"
 
-#include <utility>
-
 #pragma region constructors
 
 interpreter::builder::builder(
@@ -97,38 +95,38 @@ interpreter * interpreter::builder::build()
     //parse operations_map, lvalues_position, arguments_position
     //make all arguments as reference
 
-    lexer lexer( &_stream,
+    tokenizer tokenizer( &_stream,
         _comments_enclosure_max_level,
         R"([\r\n\t ]+)",
         R"([^\r\n\t ])");
 
     std::string edit_operations_name;
 
-    for (auto lexeme = lexer.begin_string_only();
-        lexeme != lexer.end_string_only();
-        ++lexeme)
+    for (auto token = tokenizer.begin_string_only();
+        token != tokenizer.end_string_only();
+        ++token)
     {
-        auto lexeme_str = *lexeme;
-        std::cout << lexeme_str << " ";
+        auto token_str = *token;
+        std::cout << token_str << " ";
 
 
-        if (lexeme_str=="left=")
+        if (token_str=="left=")
         {
             _lvalues_position = interpreter::left;
         }
-        else if (lexeme_str=="right=")
+        else if (token_str=="right=")
         {
             _lvalues_position = interpreter::right;
         }
-        else if (lexeme_str=="op()")
+        else if (token_str=="op()")
         {
             _arguments_position = interpreter::after_operation;
         }
-        else if (lexeme_str=="()op")
+        else if (token_str=="()op")
         {
             _arguments_position = interpreter::before_operation;
         }
-        else if (lexeme_str=="(op)")
+        else if (token_str=="(op)")
         {
             _arguments_position = interpreter::around_operation;
         }
@@ -136,13 +134,13 @@ interpreter * interpreter::builder::build()
         {
             if (edit_operations_name.empty())
             {
-                edit_operations_name = lexeme_str;
+                edit_operations_name = token_str;
             }
             else
             {
                 auto operation_func = _operations_map.obtain(edit_operations_name);
                 _operations_map.dispose(edit_operations_name);
-                _operations_map.upsert(lexeme_str, std::move(operation_func));
+                _operations_map.upsert(token_str, std::move(operation_func));
                 edit_operations_name.clear();
             }
         }

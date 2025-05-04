@@ -1,4 +1,4 @@
-#include "../include/debugger.h"
+#include "../include/debugger.hpp"
 
 bool debugger::handle_breakpoint(interpreter &interpr)
 {

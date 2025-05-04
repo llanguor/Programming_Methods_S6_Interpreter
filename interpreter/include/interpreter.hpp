@@ -1,9 +1,7 @@
 #pragma once
 #include "trie.hpp"
 #include <functional>
-
-#include "lexer.hpp"
-
+#include "tokenizer.hpp"
 
 //todo: add comments everywhere. get used to writing. also use built-in method definitions
 
@@ -14,6 +12,7 @@ public:
     friend class debugger;
 
     class builder;
+
 
 public:
 

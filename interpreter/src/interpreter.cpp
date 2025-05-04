@@ -1,6 +1,5 @@
 #include "interpreter.hpp"
-
-#include "debugger.h"
+#include "debugger.hpp"
 
 #pragma region static_fields
 
@@ -86,7 +85,7 @@ void interpreter::run(
     std::cout<<" "<<std::endl;
 
 
-    lexer _lexer_instruction(
+    tokenizer _tokenizer_instruction(
         program_file_path,
         _comments_enclosure_max_level,
         R"(;)",
@@ -94,7 +93,7 @@ void interpreter::run(
         true);
 
     int line_number = 0;
-    for (auto const & value : _lexer_instruction)
+    for (auto const & value : _tokenizer_instruction)
     {
         if (std::holds_alternative<comments_handler::control_char_types>(value))
         {
@@ -120,16 +119,16 @@ void interpreter::run(
 
         try
         {
-            lexer _lexer_assignment(
+            tokenizer _tokenizer_assignment(
             line,
             _comments_enclosure_max_level,
             R"(=)",
             _instructions_alphabet,
             false);
 
-            auto _lexer_assignment_it = _lexer_assignment.begin_string_only();
-            variable_to_assign = *_lexer_assignment_it;
-            expression_str = *++_lexer_assignment_it;
+            auto _tokenizer_assignment_it = _tokenizer_assignment.begin_string_only();
+            variable_to_assign = *_tokenizer_assignment_it;
+            expression_str = *++_tokenizer_assignment_it;
 
             if (_lvalues_position == interpreter::right)
             {

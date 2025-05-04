@@ -1,12 +1,11 @@
-#include "lexer.hpp"
-
+#include "tokenizer.hpp"
 #include <iostream>
 #include <optional>
 #include <utility>
 
-#pragma region lexer
+#pragma region tokenizer
 
-lexer::lexer(
+tokenizer::tokenizer(
     std::istream * stream,
     size_t const & enclosure_max_level,
     std::string const & regex_separators,
@@ -22,7 +21,7 @@ lexer::lexer(
     }
 }
 
-lexer::lexer(
+tokenizer::tokenizer(
     std::string const &str,
     size_t const &enclosure_max_level,
     std::string const &regex_separators,
@@ -56,36 +55,36 @@ lexer::lexer(
 }
 
 
-lexer::lexeme_iterator lexer::begin() const
+tokenizer::token_iterator tokenizer::begin() const
 {
-    return lexer::lexeme_iterator(
+    return tokenizer::token_iterator(
         _stream_ptr,
         _enclosure_max_level,
         &_regex_chars,
         &_regex_separators);
 }
 
-lexer::lexeme_iterator lexer::end() const
+tokenizer::token_iterator tokenizer::end() const
 {
-    return lexer::lexeme_iterator(
+    return tokenizer::token_iterator(
         nullptr,
         _enclosure_max_level,
         &_regex_chars,
         &_regex_separators);
 }
 
-lexer::lexeme_string_only_iterator lexer::begin_string_only() const
+tokenizer::token_string_only_iterator tokenizer::begin_string_only() const
 {
-    return lexer::lexeme_string_only_iterator(
+    return tokenizer::token_string_only_iterator(
     _stream_ptr,
     _enclosure_max_level,
     &_regex_chars,
     &_regex_separators);
 }
 
-lexer::lexeme_string_only_iterator lexer::end_string_only() const
+tokenizer::token_string_only_iterator tokenizer::end_string_only() const
 {
-    return lexer::lexeme_string_only_iterator(
+    return tokenizer::token_string_only_iterator(
     nullptr,
     _enclosure_max_level,
     &_regex_chars,
@@ -94,10 +93,9 @@ lexer::lexeme_string_only_iterator lexer::end_string_only() const
 
 #pragma endregion
 
-#pragma region lexeme_iterator
+#pragma region token_iterator
 
-
-lexer::lexeme_iterator::lexeme_iterator(
+tokenizer::token_iterator::token_iterator(
     std::istream * stream,
     size_t const enclosure_max_level,
     std::regex const * regex_chars,
@@ -117,13 +115,13 @@ lexer::lexeme_iterator::lexeme_iterator(
     }
 }
 
-bool lexer::lexeme_iterator::operator==(lexeme_iterator const &other) const noexcept
+bool tokenizer::token_iterator::operator==(token_iterator const &other) const noexcept
 {
     return _position ==
         other._position;
 }
 
-std::variant<std::string, comments_handler::control_char_types> lexer::lexeme_iterator::operator*() const
+std::variant<std::string, comments_handler::control_char_types> tokenizer::token_iterator::operator*() const
 {
     if (_position==EOF)
         throw std::out_of_range("Attempt to dereference end-iterator");
@@ -131,9 +129,9 @@ std::variant<std::string, comments_handler::control_char_types> lexer::lexeme_it
     return _current_value;
 }
 
-lexer::lexeme_iterator & lexer::lexeme_iterator::operator++()
+tokenizer::token_iterator & tokenizer::token_iterator::operator++()
 {
-    std::string lexeme;
+    std::string token;
     ++_position;
 
     while (_comments_handler_it != _comments_handler.end())
@@ -152,15 +150,15 @@ lexer::lexeme_iterator & lexer::lexeme_iterator::operator++()
 
         if (std::regex_match(str, *_regex_separators))
         {
-            if (!lexeme.empty())
+            if (!token.empty())
             {
-                _current_value = lexeme;
+                _current_value = token;
                 return *this;
             }
         }
         else if (std::regex_match(str, *_regex_chars))
         {
-            lexeme += current_char;
+            token += current_char;
         }
         else
         {
@@ -168,9 +166,9 @@ lexer::lexeme_iterator & lexer::lexeme_iterator::operator++()
         }
     }
 
-    if (!lexeme.empty())
+    if (!token.empty())
     {
-        _current_value = lexeme;
+        _current_value = token;
     }
     else
     {
@@ -180,18 +178,18 @@ lexer::lexeme_iterator & lexer::lexeme_iterator::operator++()
     return *this;
 }
 
-lexer::lexeme_iterator lexer::lexeme_iterator::operator++(int not_used)
+tokenizer::token_iterator tokenizer::token_iterator::operator++(int not_used)
 {
-    lexeme_iterator temp {*this};
+    token_iterator temp {*this};
     ++(*this);
     return temp;
 }
 
 #pragma endregion
 
-#pragma region lexeme_string_only_iterator
+#pragma region token_string_only_iterator
 
-lexer::lexeme_string_only_iterator::lexeme_string_only_iterator(
+tokenizer::token_string_only_iterator::token_string_only_iterator(
     std::istream *stream,
     size_t enclosure_max_level,
     std::regex const *regex_chars,
@@ -200,17 +198,17 @@ lexer::lexeme_string_only_iterator::lexeme_string_only_iterator(
 {
 }
 
-bool lexer::lexeme_string_only_iterator::operator==(lexeme_string_only_iterator const &other) const noexcept
+bool tokenizer::token_string_only_iterator::operator==(token_string_only_iterator const &other) const noexcept
 {
     return _it.operator==(other._it);
 }
 
-std::string lexer::lexeme_string_only_iterator::operator*()
+std::string tokenizer::token_string_only_iterator::operator*()
 {
     return std::get<std::string>(_it.operator*());
 }
 
-lexer::lexeme_string_only_iterator & lexer::lexeme_string_only_iterator::operator++()
+tokenizer::token_string_only_iterator & tokenizer::token_string_only_iterator::operator++()
 {
     try
     {
@@ -231,9 +229,9 @@ lexer::lexeme_string_only_iterator & lexer::lexeme_string_only_iterator::operato
     return *this;
 }
 
-lexer::lexeme_string_only_iterator lexer::lexeme_string_only_iterator::operator++(int not_used)
+tokenizer::token_string_only_iterator tokenizer::token_string_only_iterator::operator++(int not_used)
 {
-    lexeme_string_only_iterator temp {*this};
+    token_string_only_iterator temp {*this};
     ++(*this);
     return temp;
 }

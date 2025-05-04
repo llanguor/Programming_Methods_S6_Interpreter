@@ -5,10 +5,10 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_subdirectory(trie)
 add_subdirectory(interpreter)
-add_subdirectory(lexer)
+add_subdirectory(tokenizer)
 
 add_executable(Programming_Methods_S6_Interpreter main.cpp)
 
 target_link_libraries(Programming_Methods_S6_Interpreter PRIVATE trie)
 target_link_libraries(Programming_Methods_S6_Interpreter PRIVATE interpreter)
-target_link_libraries(Programming_Methods_S6_Interpreter PRIVATE lexer)
+target_link_libraries(Programming_Methods_S6_Interpreter PRIVATE tokenizer)
