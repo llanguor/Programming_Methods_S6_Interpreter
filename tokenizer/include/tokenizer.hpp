@@ -36,6 +36,25 @@ public:
 
 public:
 
+    /*
+    struct iterator_data
+    {
+
+    public:
+
+        std::string const token;
+
+        char const separator;
+
+    public:
+
+        explicit iterator_data(
+            std::string const & token,
+            char const & separator):
+        token(token), separator(separator) {};
+    };
+    */
+
     class token_iterator
     {
 

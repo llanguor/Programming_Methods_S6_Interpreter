@@ -8,7 +8,7 @@
 #include "interpreter.hpp"
 #include "tokenizer.hpp"
 
-
+template<typename interpreter_type>
 class interpreter::builder
 {
 
@@ -24,7 +24,7 @@ private:
     size_t _base_output=10;
     size_t _comments_enclosure_max_level=1;
     bool _is_debug_mode_enabled = false;
-    std::string _variables_alphabet = interpreter::_default_variables_alphabet;
+    std::string _variables_alphabet = interpreter::default_variables_alphabet;
 
 private:
     //init by file parse
@@ -70,15 +70,8 @@ public:
 
 public:
 
-    interpreter * build();
-
-
-/*
-    size_t _base_assign=10;
-    size_t _base_input=10;
-    size_t _base_output=10;
-    bool _is_debug = false;
-    std::string _variables_alphabet = interpreter::_default_variables_alphabet;
-    */
+    interpreter_type * build();
 
 };
+
+#include "builder.tpp"

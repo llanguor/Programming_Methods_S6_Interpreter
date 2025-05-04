@@ -3,7 +3,7 @@
 
 #pragma region static_fields
 
-std::string const interpreter::_default_variables_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+std::string const interpreter::default_variables_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
 #pragma endregion
 
@@ -144,18 +144,39 @@ void interpreter::run(
         std::cout<<"EXPRESSION: "<< expression_str <<std::endl;
         ++line_number;
 
-        auto result = expression_to_reverse_polish_notation(expression_str);
 
-        execute_sequence_of_functions(result);
+        auto result = calculate_expression(expression_str);
+        try
+        {
+            _variables.upsert(variable_to_assign, std::move(result));
+        }
+        catch (std::out_of_range e)
+        {
+            throw std::out_of_range(
+                "Incorrect variable name at line " +
+                std::to_string(line_number) +
+                "character is not contained in alphabet");
+        }
     }
 }
 
-std::string const interpreter::expression_to_reverse_polish_notation(std::string const &input)
+#pragma endregion
+
+#pragma region interpreter_rpn
+
+int interpreter_rpn::calculate_expression(std::string const &expression)
+{
+    auto rpn = expression_to_reverse_polish_notation(expression);
+    auto result = execute_sequence_of_functions(rpn);
+    return result;
+}
+
+std::string const interpreter_rpn::expression_to_reverse_polish_notation(std::string const &input)
 {
     return input;
 }
 
-int interpreter::execute_sequence_of_functions(std::string const &input)
+int interpreter_rpn::execute_sequence_of_functions(std::string const &input)
 {
     return -1;
 }

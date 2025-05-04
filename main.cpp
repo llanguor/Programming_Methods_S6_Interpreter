@@ -18,7 +18,7 @@ int main()
     auto functions_trie = operations::get_functions_trie();
 
     auto interpreter =
-        interpreter::builder(path+"settings.txt")
+        interpreter::builder<interpreter_rpn>(path+"settings.txt")
     .append_function_map(functions_trie)
     .set_debug_mode(true)
     .build();

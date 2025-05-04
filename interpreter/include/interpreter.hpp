@@ -11,12 +11,13 @@ public:
 
     friend class debugger;
 
+    template<typename interpreter_type>
     class builder;
 
 
 public:
 
-    static std::string const _default_variables_alphabet;
+    static std::string const default_variables_alphabet;
 
 private:
 
@@ -98,6 +99,30 @@ public:
         size_t const & base_assign,
         size_t const & base_input,
         size_t const & base_output);
+
+private:
+
+    virtual int calculate_expression(
+        std::string const & expression) = 0;
+
+public:
+
+    virtual ~interpreter() = default;
+
+};
+
+class interpreter_rpn final : public interpreter
+{
+public:
+
+    using interpreter::interpreter; //derived constructors
+
+private:
+
+    int calculate_expression(
+        std::string const & expression) override;
+
+private:
 
     std::string const expression_to_reverse_polish_notation(
         std::string const & input);

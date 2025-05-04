@@ -11,7 +11,7 @@ class operations
 
 public:
 
-    static std::string const _default_operations_alphabet;
+    static std::string const default_operations_alphabet;
 
 public:
 
@@ -22,7 +22,7 @@ public:
 public:
 
     static trie<std::function<int(std::vector<int>)>> get_functions_trie(
-        std::string const & alphabet = _default_operations_alphabet);
+        std::string const & alphabet = default_operations_alphabet);
 
 public:
 
