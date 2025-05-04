@@ -9,6 +9,11 @@
 
 class interpreter
 {
+public:
+
+    friend class debugger;
+
+    class builder;
 
 public:
 
@@ -89,19 +94,16 @@ public:
         bool const & is_debug_mode_enabled);
 
     void run(
-    std::string const & program_file_path,
-    bool const & is_debug_mode_enabled,
-    size_t const & base_assign,
-    size_t const & base_input,
-    size_t const & base_output);
+        std::string const & program_file_path,
+        bool const & is_debug_mode_enabled,
+        size_t const & base_assign,
+        size_t const & base_input,
+        size_t const & base_output);
 
-    std::string const expresion_to_reverse_polish_notation(
+    std::string const expression_to_reverse_polish_notation(
         std::string const & input);
 
-    void execute_sequence_of_functions(
+    int execute_sequence_of_functions(
         std::string const & input);
 
-public:
-
-    class builder;
 };

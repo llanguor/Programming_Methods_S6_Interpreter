@@ -1,5 +1,7 @@
 #include "interpreter.hpp"
 
+#include "debugger.h"
+
 #pragma region static_fields
 
 std::string const interpreter::_default_variables_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
@@ -96,11 +98,15 @@ void interpreter::run(
     {
         if (std::holds_alternative<comments_handler::control_char_types>(value))
         {
-            switch (std::get<comments_handler::control_char_types>(value))
+            if (is_debug_mode_enabled)
             {
-                case comments_handler::control_char_types::debug:
-                    //debug mode
-                    break;
+                switch (std::get<comments_handler::control_char_types>(value))
+                {
+                    case comments_handler::control_char_types::breakpoint:
+                        auto result = debugger::handle_breakpoint(*this);
+                        if (!result) return;
+                        break;
+                }
             }
             continue;
         }
@@ -139,19 +145,20 @@ void interpreter::run(
         std::cout<<"EXPRESSION: "<< expression_str <<std::endl;
         ++line_number;
 
-        auto result = expresion_to_reverse_polish_notation(expression_str);
+        auto result = expression_to_reverse_polish_notation(expression_str);
 
         execute_sequence_of_functions(result);
     }
 }
 
-std::string const interpreter::expresion_to_reverse_polish_notation(std::string const &input)
+std::string const interpreter::expression_to_reverse_polish_notation(std::string const &input)
 {
     return input;
 }
 
-void interpreter::execute_sequence_of_functions(std::string const &input)
+int interpreter::execute_sequence_of_functions(std::string const &input)
 {
+    return -1;
 }
 
 #pragma endregion

@@ -8,7 +8,8 @@
 
 std::map<std::string,  comments_handler::control_char_types> const comments_handler::control_char_types_map =
 {
-    { "DEBUG", comments_handler::control_char_types::debug }
+    { "BREAKPOINT", comments_handler::control_char_types::breakpoint },
+    { "breakpoint", comments_handler::control_char_types::breakpoint }
 };
 
 #pragma endregion

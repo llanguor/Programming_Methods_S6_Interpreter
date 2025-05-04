@@ -21,6 +21,7 @@ int main()
     auto interpreter =
         interpreter::builder(path+"settings.txt")
     .append_function_map(functions_trie)
+    .set_debug_mode(true)
     .build();
 
     interpreter->run(path+"program1.txt");

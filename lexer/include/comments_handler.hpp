@@ -17,7 +17,7 @@ public:
 
     enum control_char_types
     {
-        debug
+        breakpoint
     };
 
     static std::map<std::string, control_char_types> const control_char_types_map;
