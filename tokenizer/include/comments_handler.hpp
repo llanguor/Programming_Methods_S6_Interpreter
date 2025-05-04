@@ -4,6 +4,7 @@
 #include <map>
 #include <variant>
 #include <sstream>
+#include <memory>
 
 class comments_handler
 {
@@ -37,10 +38,11 @@ public:
         std::istream * _stream;
         int const _enclosure_max_level;
 
-        std::variant<int, control_char_types> _current_value = EOF;
         size_t _multiline_comment_enclosure_level = 0;
         bool _in_single_line_comment = false;
         std::string _single_line_comment_cache;
+
+        std::variant<int, control_char_types> _current_value = EOF;
 
     public:
 
@@ -52,13 +54,14 @@ public:
 
         bool operator==(control_char_iterator const &other) const noexcept;
 
-        virtual std::variant<int, control_char_types> operator*() const;
+        virtual std::variant<int, control_char_types> const & operator*();
 
         control_char_iterator &operator++();
 
         control_char_iterator operator++(int not_used);
 
         virtual ~control_char_iterator() = default;
+
     };
 
 

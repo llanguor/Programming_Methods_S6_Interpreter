@@ -1,5 +1,7 @@
 #pragma once
+
 #include <utility>
+
 #include "trie.hpp"
 
 
@@ -182,17 +184,19 @@ trie<tvalue>::iterator_base::iterator_base(
 }
 
 template<typename tvalue>
-typename trie<tvalue>::iterator_data * trie<tvalue>::iterator_base::operator*() const
+typename trie<tvalue>::iterator_data & trie<tvalue>::iterator_base::operator*()
 {
     if (_stack.top()==nullptr)
     {
         throw std::out_of_range("Attempted to access past-the-end element");
     }
 
-    return new iterator_data(
+    _current_data = std::make_shared<iterator_data>(
         iterator_base::_stack.size()-1,
         _assembled_key,
         iterator_base::_stack.top()->value.value());
+
+    return *_current_data;
 }
 
 
@@ -351,7 +355,7 @@ typename trie<tvalue>::infix_iterator trie<tvalue>::end() const noexcept
 }
 
 template<typename tvalue>
-typename trie<tvalue>::iterator_data * trie<tvalue>::infix_iterator::operator*() const
+typename trie<tvalue>::iterator_data & trie<tvalue>::infix_iterator::operator*()
 {
     return iterator_base::operator*();
 }

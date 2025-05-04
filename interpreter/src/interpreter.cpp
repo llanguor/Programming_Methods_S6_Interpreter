@@ -95,15 +95,14 @@ void interpreter::run(
     int line_number = 0;
     for (auto const & value : _tokenizer_instruction)
     {
-        if (std::holds_alternative<comments_handler::control_char_types>(value))
+        if (auto control_char_value = dynamic_cast<tokenizer::iterator_data_control_char *>(value))
         {
             if (is_debug_mode_enabled)
             {
-                switch (std::get<comments_handler::control_char_types>(value))
+                switch (control_char_value->value)
                 {
                     case comments_handler::control_char_types::breakpoint:
-                        auto result = debugger::handle_breakpoint(*this);
-                        if (!result) return;
+                        if (!debugger::handle_breakpoint(*this)) return;
                         break;
                 }
             }
@@ -111,24 +110,23 @@ void interpreter::run(
         }
 
 
-        auto line = std::get<std::string>(value);
+        auto line = dynamic_cast<tokenizer::iterator_data_string *>(value)->token;
        // std::cout << "INSTRUCTION: [" <<line << "]" << std::endl;
-
 
         std::string variable_to_assign, expression_str;
 
         try
         {
             tokenizer _tokenizer_assignment(
-            line,
-            _comments_enclosure_max_level,
-            R"(=)",
-            _instructions_alphabet,
-            false);
+                line,
+                _comments_enclosure_max_level,
+                R"(=)",
+                _instructions_alphabet,
+                false);
 
             auto _tokenizer_assignment_it = _tokenizer_assignment.begin_string_only();
-            variable_to_assign = *_tokenizer_assignment_it;
-            expression_str = *++_tokenizer_assignment_it;
+            variable_to_assign = _tokenizer_assignment_it->token;
+            expression_str = (++_tokenizer_assignment_it)->token;
 
             if (_lvalues_position == interpreter::right)
             {
@@ -173,6 +171,29 @@ int interpreter_rpn::calculate_expression(std::string const &expression)
 
 std::string const interpreter_rpn::expression_to_reverse_polish_notation(std::string const &input)
 {
+    tokenizer tokenizer(
+                input,
+                _comments_enclosure_max_level,
+                R"([(),])",
+                R"([^(),])",
+                false);
+    for (
+        auto it = tokenizer.begin_string_only();
+        it != tokenizer.end_string_only();
+        ++it)
+    {
+        std::cout<<"EXPRESSION_RES: ";
+        std::cout<<"["<<it->token<<"]["<<it->right_separator <<"]"<< std::endl;
+    }
+
+    //todo: check end of line!
+    /*
+    EXPRESSION: add(div(var_2,5),rem(var_1,2))
+    ...
+    EXPRESSION_RES: [var_1][,]
+    EXPRESSION_RES: [2][)]      <-----!!!!!!!!!!
+    */
+
     return input;
 }
 

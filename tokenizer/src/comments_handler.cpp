@@ -3,6 +3,7 @@
 #include "comments_handler.hpp"
 
 #include <iostream>
+#include <optional>
 
 #pragma region static_fields
 
@@ -73,7 +74,7 @@ bool comments_handler::control_char_iterator::operator==(control_char_iterator c
             _stream->tellg() == other._stream->tellg());
 }
 
-std::variant<int, comments_handler::control_char_types> comments_handler::control_char_iterator::operator*() const
+std::variant<int, comments_handler::control_char_types> const & comments_handler::control_char_iterator::operator*()
 {
     if (_stream==nullptr)
         throw std::out_of_range("Attempt to dereference end-iterator");

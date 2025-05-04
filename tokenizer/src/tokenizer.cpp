@@ -1,7 +1,4 @@
 #include "tokenizer.hpp"
-#include <iostream>
-#include <optional>
-#include <utility>
 
 #pragma region tokenizer
 
@@ -73,6 +70,7 @@ tokenizer::token_iterator tokenizer::end() const
         &_regex_separators);
 }
 
+
 tokenizer::token_string_only_iterator tokenizer::begin_string_only() const
 {
     return tokenizer::token_string_only_iterator(
@@ -121,12 +119,12 @@ bool tokenizer::token_iterator::operator==(token_iterator const &other) const no
         other._position;
 }
 
-std::variant<std::string, comments_handler::control_char_types> tokenizer::token_iterator::operator*() const
+tokenizer::iterator_data * tokenizer::token_iterator::operator*() const
 {
     if (_position==EOF)
         throw std::out_of_range("Attempt to dereference end-iterator");
 
-    return _current_value;
+    return &*_current_data;
 }
 
 tokenizer::token_iterator & tokenizer::token_iterator::operator++()
@@ -141,7 +139,10 @@ tokenizer::token_iterator & tokenizer::token_iterator::operator++()
 
         if (std::holds_alternative<comments_handler::control_char_types>(current_char_value))
         {
-            _current_value = std::get<comments_handler::control_char_types>(current_char_value);
+            _current_data =
+                std::make_shared<iterator_data_control_char>(
+                    std::get<comments_handler::control_char_types>(
+                        current_char_value));
             return *this;
         }
 
@@ -152,7 +153,7 @@ tokenizer::token_iterator & tokenizer::token_iterator::operator++()
         {
             if (!token.empty())
             {
-                _current_value = token;
+                _current_data = std::make_shared<iterator_data_string>(token, current_char);
                 return *this;
             }
         }
@@ -168,7 +169,7 @@ tokenizer::token_iterator & tokenizer::token_iterator::operator++()
 
     if (!token.empty())
     {
-        _current_value = token;
+        _current_data = std::make_shared<iterator_data_string>(token, EOF);
     }
     else
     {
@@ -187,6 +188,7 @@ tokenizer::token_iterator tokenizer::token_iterator::operator++(int not_used)
 
 #pragma endregion
 
+
 #pragma region token_string_only_iterator
 
 tokenizer::token_string_only_iterator::token_string_only_iterator(
@@ -203,18 +205,21 @@ bool tokenizer::token_string_only_iterator::operator==(token_string_only_iterato
     return _it.operator==(other._it);
 }
 
-std::string tokenizer::token_string_only_iterator::operator*()
+tokenizer::iterator_data_string & tokenizer::token_string_only_iterator::operator*() const
 {
-    return std::get<std::string>(_it.operator*());
+    return *dynamic_cast<iterator_data_string *>(_it.operator*()); //std::get<std::string>(_it.operator*());
+}
+
+tokenizer::iterator_data_string * tokenizer::token_string_only_iterator::operator->() const
+{
+    return &**this;
 }
 
 tokenizer::token_string_only_iterator & tokenizer::token_string_only_iterator::operator++()
 {
     try
     {
-        while (
-            std::holds_alternative<comments_handler::control_char_types>(
-                *++_it))
+        while (dynamic_cast<iterator_data_control_char *>(*++_it))
         {
 
         }

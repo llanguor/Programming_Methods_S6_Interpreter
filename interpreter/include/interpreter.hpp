@@ -19,7 +19,7 @@ public:
 
     static std::string const default_variables_alphabet;
 
-private:
+protected:
 
     enum lvalues_position_types
     {
@@ -34,7 +34,7 @@ private:
         before_operation,
     };
 
-private:
+protected:
 
     //trie<std::string> _operands_ident; //for =();
     trie<std::function<int(std::vector<int>)>> const _operations;
@@ -42,14 +42,14 @@ private:
     arguments_position_types const _arguments_position;
     size_t const _comments_enclosure_max_level;
 
-private:
+protected:
 
     bool _is_debug_mode_enabled;
     size_t _base_assign;
     size_t _base_input;
     size_t _base_output;
 
-private:
+protected:
 
     trie<int> _variables;
     std::string const _instructions_alphabet = R"([A-Za-z0-9!#$%&'()*+,-./:<=>?@[\]^_`{|}~])";

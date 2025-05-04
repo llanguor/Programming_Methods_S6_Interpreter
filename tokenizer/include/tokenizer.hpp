@@ -3,6 +3,9 @@
 #include "comments_handler.hpp"
 #include <regex>
 #include <format>
+#include <iostream>
+#include <optional>
+#include <utility>
 
 class tokenizer
 {
@@ -36,24 +39,44 @@ public:
 
 public:
 
-    /*
     struct iterator_data
     {
+        virtual ~iterator_data() = default;
+    };
 
+    struct iterator_data_string final : iterator_data
+    {
     public:
 
         std::string const token;
 
-        char const separator;
+        char const right_separator;
 
     public:
 
-        explicit iterator_data(
+        explicit iterator_data_string(
             std::string const & token,
             char const & separator):
-        token(token), separator(separator) {};
+        token(token), right_separator(separator) {};
+
     };
-    */
+
+    struct iterator_data_control_char final : iterator_data
+    {
+
+    public:
+
+        control_char_types const value;
+
+    public:
+
+        explicit iterator_data_control_char(
+            control_char_types const & value):
+        value(value) {};
+
+    };
+
+public:
 
     class token_iterator
     {
@@ -66,6 +89,7 @@ public:
         int _position=0;
         std::regex const * _regex_separators;
         std::regex const * _regex_chars;
+        std::shared_ptr<iterator_data> _current_data;
 
     public:
 
@@ -79,13 +103,12 @@ public:
 
         bool operator==(token_iterator const &other) const noexcept;
 
-        std::variant<std::string, comments_handler::control_char_types> operator*() const;
+        iterator_data * operator*() const;
 
         token_iterator &operator++();
 
         token_iterator operator++(int not_used);
     };
-
 
     class token_string_only_iterator
     {
@@ -105,7 +128,9 @@ public:
         bool operator==(
             token_string_only_iterator const &other) const noexcept;
 
-        std::string operator*();
+        iterator_data_string & operator*() const;
+
+        iterator_data_string* operator->() const;
 
         token_string_only_iterator
             & operator++();
@@ -123,5 +148,6 @@ public:
     [[nodiscard]] token_string_only_iterator begin_string_only() const;
 
     [[nodiscard]] token_string_only_iterator end_string_only() const;
+
 
 };

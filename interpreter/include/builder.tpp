@@ -47,11 +47,11 @@ template<typename interpreter_type>
 interpreter::builder<interpreter_type> & interpreter::builder<interpreter_type>::append_function_map(
     trie<std::function<int(std::vector<int>)>> const & functions_map)
 {
-    for (auto const & it : functions_map)
+    for (auto & it : functions_map)
     {
         _operations_map.upsert(
-            it->key,
-            std::move(it->value));
+            it.key,
+            std::move(it.value));
     }
     return *this;
 }
@@ -119,7 +119,7 @@ interpreter_type * interpreter::builder<interpreter_type>::build()
         token != tokenizer.end_string_only();
         ++token)
     {
-        auto token_str = *token;
+        auto token_str = token->token;
         std::cout << token_str << " ";
 
 

@@ -120,6 +120,8 @@ public:
 
         std::map<char, size_t> const & _alphabet_mapping;
 
+        std::shared_ptr<iterator_data> _current_data;
+
     protected:
 
         explicit iterator_base(
@@ -132,7 +134,7 @@ public:
         bool operator!=(
             iterator_base const &other) const noexcept;
 
-        iterator_data *operator*() const;
+        iterator_data & operator*();
 
         void fall_to_next_bottom();
     };
@@ -160,7 +162,7 @@ public:
         infix_iterator operator++(
             int not_used);
 
-        iterator_data *operator*() const;
+        iterator_data & operator*();
 
 
     };

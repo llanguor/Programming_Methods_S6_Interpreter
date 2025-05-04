@@ -74,7 +74,7 @@ void debugger::print_all_variables(interpreter &inter)
     std::cout<<"Variable list:"<<std::endl;
     for (auto const & variable : inter._variables)
     {
-        std::cout<<variable->key<<"="<<variable->value<<std::endl;
+        std::cout<<variable.key<<"="<<variable.value<<std::endl;
     }
 }
 
