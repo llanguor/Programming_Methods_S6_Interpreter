@@ -2,6 +2,7 @@
 #include "trie.hpp"
 #include <functional>
 #include "tokenizer.hpp"
+#include "operations.hpp"
 #include <queue>
 
 //todo: add comments everywhere. get used to writing. also use built-in method definitions
@@ -38,7 +39,7 @@ protected:
 protected:
 
     //trie<std::string> _operands_ident; //for =();
-    trie<std::function<int(std::vector<int>)>> const _operations;
+    trie<std::function<int(std::vector<int>)>> _operations;
     lvalues_position_types const _lvalues_position;
     arguments_position_types const _arguments_position;
     size_t const _comments_enclosure_max_level;
@@ -110,35 +111,4 @@ public:
 
     virtual ~interpreter() = default;
 
-};
-
-class interpreter_rpn final : public interpreter
-{
-public:
-
-    using interpreter::interpreter; //derived constructors
-
-private:
-
-    int calculate_expression(
-        std::string const & expression) override;
-
-private:
-
-    std::string const expression_to_reverse_polish_notation(
-        std::string const & input);
-
-    int execute_sequence_of_functions(
-        std::string const & input);
-
-private:
-
-    std::queue<std::string> parse_to_rpn_after(
-        std::string const & input);
-
-    std::queue<std::string> parse_to_rpn_before(
-        std::string const & input);
-
-    std::queue<std::string> parse_to_rpn_around(
-        std::string const & input);
 };

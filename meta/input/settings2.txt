@@ -1,0 +1,18 @@
+left=
+()op
+
+#can be changed
+[
+add add
+and and
+div div
+rem rem
+input input
+mult mult
+not not
+or or
+output output
+pow pow
+sub sub
+xor xor
+]

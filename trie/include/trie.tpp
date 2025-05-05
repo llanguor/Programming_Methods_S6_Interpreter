@@ -104,7 +104,7 @@ tvalue &trie<tvalue>::obtain(
     auto path = find_path(key);
     if (*path.top() == nullptr || !(*path.top())->value)
     {
-        throw std::out_of_range("key is not contained in trie");
+        throw std::out_of_range("key is not contained in trie: "+key);
     }
     return *((*path.top())->value);
 }

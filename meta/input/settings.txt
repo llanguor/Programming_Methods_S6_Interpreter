@@ -1,6 +1,0 @@
-left= #comment
-op()
-add sum
-div /
-rem %
-#= ->

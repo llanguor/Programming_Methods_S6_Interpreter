@@ -18,6 +18,7 @@ void operations::throw_if_unexpected_size(
     }
 }
 
+
 trie<std::function<int(std::vector<int>)>>
 operations::get_functions_trie(
     std::string const & alphabet)
@@ -37,6 +38,45 @@ operations::get_functions_trie(
     functions_trie.upsert("or", operations::_or);
     return functions_trie;
 }
+
+
+int operations::base_to_decimal(
+    std::string const &value, int const &base)
+{
+    std::size_t pos = 0;
+    auto result = std::stoi(value, &pos, base);
+    if (pos != value.size())
+    {
+        throw std::invalid_argument("The input data contains an invalid value: '" + value.substr(pos) + "'");
+    }
+    return result;
+}
+
+std::string operations::decimal_to_base(
+    int const &value, int const & base)
+{
+        if (base < 2 || base > 36)
+            throw std::invalid_argument("Base must be between 2 and 36");
+
+        if (value == 0) return "0";
+
+        bool negative = value < 0;
+        unsigned int n = std::abs(value);
+        std::string result;
+
+        while (n > 0)
+        {
+            int digit = n % base;
+            char c = digit < 10 ? ('0' + digit) : ('A' + digit - 10);
+            result += c;
+            n /= base;
+        }
+
+        if (negative) result += '-';
+        std::reverse(result.begin(), result.end());
+        return result;
+}
+
 
 #pragma endregion
 

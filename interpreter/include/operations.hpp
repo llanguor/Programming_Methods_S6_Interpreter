@@ -15,12 +15,6 @@ public:
 
 public:
 
-    static void throw_if_unexpected_size(
-        unsigned long long const & current_size,
-        unsigned long long const & expected_size);
-
-public:
-
     static trie<std::function<int(std::vector<int>)>> get_functions_trie(
         std::string const & alphabet = default_operations_alphabet);
 
@@ -51,5 +45,19 @@ public:
     static int _and(std::vector<int> const &argv);
 
     static int _or(std::vector<int> const &argv);
+
+private:
+
+    static void throw_if_unexpected_size(
+        unsigned long long const & current_size,
+        unsigned long long const & expected_size);
+
+public:
+
+    static int base_to_decimal(
+        std::string const &value, int const &base);
+
+    static std::string decimal_to_base(
+        int const &value, int const & base);
 
 };

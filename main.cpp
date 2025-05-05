@@ -4,7 +4,7 @@
 #include <memory>
 #include <sstream>
 #include<filesystem>
-#include "interpreter.hpp"
+#include "interpreter_rpn.hpp"
 #include "builder.hpp"
 #include "operations.hpp"
 #include "comments_handler.hpp"
@@ -13,19 +13,29 @@
 
 int main()
 {
+
     std::string const path = "../meta/input/";
 
     auto functions_trie = operations::get_functions_trie();
 
     auto interpreter =
-        interpreter::builder<interpreter_rpn>(path+"settings.txt")
+        interpreter::builder<interpreter_rpn>(path+"settings2.txt")
     .append_function_map(functions_trie)
     .set_debug_mode(true)
+    .set_base_assign(16)
     .build();
-
-    interpreter->run(path+"program1.txt");
+   // try
+    {
+        interpreter->run(path+"program2.txt");
+    }
+   // catch(const std::exception& e)
+    {
+        //std::cout<<e.what()<<std::endl;
+    }
 
     delete interpreter;
+
+
     /*
     std::stringstream ss1 ("asdas#DEBUGd\nd");
     comments_handler asd (&ss1, 1);
