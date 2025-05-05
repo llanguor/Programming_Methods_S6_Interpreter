@@ -36,17 +36,6 @@ int main()
     delete interpreter;
 
 
-    /*
-    std::stringstream ss1 ("asdas#DEBUGd\nd");
-    comments_handler asd (&ss1, 1);
-    auto it = asd.begin_char_only();
-    while (it!=asd.end_char_only())
-    {
-        auto aaaa = *it;
-        std::cout << static_cast<char>( aaaa);
-        ++it;
-    }
-    */
 
     /*
     tokenizer tok (settings_path, 1,R"([\r\n\t ]+)",R"([^\r\n\t ])", true);

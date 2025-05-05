@@ -215,16 +215,84 @@ std::queue<interpreter_rpn::expression_element> interpreter_rpn::parse_to_rpn_be
 
 std::queue<interpreter_rpn::expression_element> interpreter_rpn::parse_to_rpn_around(std::string const &input)
 {
+    bool last_token_is_operator = false;
     std::stack<std::string> stack;
     std::queue<expression_element> queue;
     std::stack<int> arguments_count_stack;
-    tokenizer tokenizer(input+')',_comments_enclosure_max_level,
+    tokenizer tokenizer(input,_comments_enclosure_max_level,
                     R"([(),])", R"([^(),])", false, true);
 
 
     for (auto it = tokenizer.begin_string_only(); it != tokenizer.end_string_only(); ++it)
     {
-        std::cout<<it->left_separator<<" ";
+        //first or last bracket
+        if (it->token!="" && it->right_separator==EOF && it->left_separator==EOF)
+        {
+            queue.push(expression_element(operand, it->token));
+        }
+        else if (it->token=="")
+        {
+            if (it->left_separator!=',' && it->right_separator!=',')
+            {
+                stack.push(std::string(1,it->left_separator));
+            }
+        }
+        //left variable
+        else if (it->left_separator=='(' && it->right_separator==',')
+        {
+            stack.push(std::string(1,it->left_separator));
+            queue.push(expression_element(operand, it->token));
+            last_token_is_operator=true;
+        }
+        //function 2 arg
+        else if (it->left_separator==',' && it->right_separator==','
+            || it->left_separator==')' && it->right_separator=='(')
+        {
+            stack.push(it->token);
+            arguments_count_stack.push(2);
+            last_token_is_operator=false;
+        }
+        //function 1 arg
+        else if (last_token_is_operator==true &&
+            it->left_separator==',' &&
+            (it->right_separator==')' || it->right_separator==EOF))
+        {
+            stack.push(it->token);
+            stack.push(std::string(1,it->right_separator));
+            arguments_count_stack.push(1);
+            last_token_is_operator=false;
+
+        }
+        //right variable
+        else if (it->left_separator==',' && it->right_separator==')')
+        {
+            stack.push(std::string(1,it->right_separator));
+            queue.push(expression_element(operand, it->token));
+            last_token_is_operator=true;
+        }
+
+        if (!stack.empty() && stack.top()==")")
+        {
+            while (!stack.empty() && stack.top()==")")
+            {
+                stack.pop();
+            }
+
+            if (stack.size()<2 || arguments_count_stack.empty())
+            {
+                throw std::runtime_error("incorrect syntax");
+            }
+
+            queue.push(expression_element(
+                function,
+                std::move(stack.top()), ////!
+                std::move(arguments_count_stack.top())
+                ));
+
+            stack.pop();
+            stack.pop();
+            arguments_count_stack.pop();
+        }
 
     }
 

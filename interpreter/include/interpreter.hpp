@@ -95,13 +95,6 @@ public:
         std::string const & program_file_path,
         bool const & is_debug_mode_enabled);
 
-    void run(
-        std::string const & program_file_path,
-        bool const & is_debug_mode_enabled,
-        size_t const & base_assign,
-        size_t const & base_input,
-        size_t const & base_output);
-
 private:
 
     virtual int calculate_expression(

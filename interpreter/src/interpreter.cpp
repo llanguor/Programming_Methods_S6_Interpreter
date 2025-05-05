@@ -32,6 +32,16 @@ interpreter::interpreter(
     _is_debug_mode_enabled(is_debug_mode_enabled),
     _variables(variables_alphabet)
 {
+    try
+    {
+        _variables.upsert("base_input", base_input);
+        _variables.upsert("base_output", base_output);
+        _variables.upsert("base_assign", base_assign);
+    }
+    catch (std::out_of_range)
+    {
+        throw std::invalid_argument("the variable alphabet must include symbols for the interpreter's reserved words: base_input, base_output, base_assign");
+    }
 }
 
 #pragma endregion
@@ -66,22 +76,14 @@ interpreter & interpreter::set_debug_mode(bool const &is_debug_mode_enabled)
 
 #pragma region methods
 
-void interpreter::run(std::string const &program_file_path, bool const &is_debug_mode_enabled)
-{
-    run(program_file_path, is_debug_mode_enabled, _base_assign, _base_input, _base_output);
-}
-
 void interpreter::run(std::string const &program_file_path)
 {
-    run(program_file_path, _is_debug_mode_enabled, _base_assign, _base_input, _base_output);
+    run(program_file_path, _is_debug_mode_enabled);
 }
 
 void interpreter::run(
     std::string const &program_file_path,
-    bool const &is_debug_mode_enabled,
-    size_t const &base_assign,
-    size_t const &base_input,
-    size_t const &base_output)
+    bool const &is_debug_mode_enabled)
 {
     std::cout<<" "<<std::endl;
 
