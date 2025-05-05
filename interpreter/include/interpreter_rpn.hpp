@@ -9,8 +9,7 @@ private:
     enum expression_element_type
     {
         operand,
-        function,
-        bracket
+        function
     };
 
     class expression_element
@@ -21,24 +20,20 @@ private:
         std::string const value;
         int arguments_count;
 
-        explicit expression_element():
-            type(bracket),
-            arguments_count(0)
-        {
-        }
-
         explicit expression_element(
+            expression_element_type const & type,
             std::string const & value):
-            type(operand),
+            type(type),
             value(value),
             arguments_count(0)
         {
         }
 
         explicit expression_element(
+            expression_element_type const & type,
             std::string const & value,
             int const & arguments_count):
-            type(function),
+            type(type),
             value(value),
             arguments_count(arguments_count)
         {
@@ -52,7 +47,8 @@ public:
 private:
 
     int calculate_expression(
-        std::string const & expression) override;
+        std::string const & expression,
+        int const & line_number) override;
 
 private:
 

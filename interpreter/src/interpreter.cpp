@@ -139,12 +139,9 @@ void interpreter::run(
             throw std::runtime_error("Invalid content in program file on line " + std::to_string(line_number));
         }
 
-        std::cout<<"VARIABLE: "<< variable_to_assign <<std::endl;
-        std::cout<<"EXPRESSION: "<< expression_str <<std::endl;
-        ++line_number;
 
+        auto result = calculate_expression(expression_str, line_number);
 
-        auto result = calculate_expression(expression_str);
         try
         {
             _variables.upsert(variable_to_assign, std::move(result));
@@ -156,6 +153,9 @@ void interpreter::run(
                 std::to_string(line_number) +
                 "character is not contained in alphabet");
         }
+
+        ++line_number;
+
     }
 }
 

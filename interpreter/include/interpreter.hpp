@@ -105,7 +105,7 @@ public:
 private:
 
     virtual int calculate_expression(
-        std::string const & expression) = 0;
+        std::string const & expression, int const & line_number) = 0;
 
 public:
 

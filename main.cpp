@@ -19,14 +19,14 @@ int main()
     auto functions_trie = operations::get_functions_trie();
 
     auto interpreter =
-        interpreter::builder<interpreter_rpn>(path+"settings2.txt")
+        interpreter::builder<interpreter_rpn>(path+"settings3.txt")
     .append_function_map(functions_trie)
     .set_debug_mode(true)
-    .set_base_assign(16)
+    .set_base_assign(10)
     .build();
    // try
     {
-        interpreter->run(path+"program2.txt");
+        interpreter->run(path+"program3.txt");
     }
    // catch(const std::exception& e)
     {
