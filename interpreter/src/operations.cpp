@@ -98,7 +98,7 @@ int operations::input(std::vector<int> const &argv)
         throw std::invalid_argument("Base must be between 2 and 36.");
     }
 
-    std::cout << "Enter a number in base " << base_input << ": ";
+    std::cout << "Enter a number in base " << base_input << ":\n";
     std::string input_value;
     std::cin >> input_value;
 

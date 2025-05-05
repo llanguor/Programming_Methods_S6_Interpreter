@@ -13,20 +13,19 @@
 
 int main()
 {
-
     std::string const path = "../meta/input/";
 
     auto functions_trie = operations::get_functions_trie();
 
     auto interpreter =
-        interpreter::builder<interpreter_rpn>(path+"settings3.txt")
+        interpreter::builder<interpreter_rpn>(path+"settings2.txt")
     .append_function_map(functions_trie)
     .set_debug_mode(true)
     .set_base_assign(10)
     .build();
    // try
     {
-        interpreter->run(path+"program3.txt");
+        interpreter->run(path+"program2.txt");
     }
    // catch(const std::exception& e)
     {
@@ -34,19 +33,6 @@ int main()
     }
 
     delete interpreter;
-
-
-
-    /*
-    tokenizer tok (settings_path, 1,R"([\r\n\t ]+)",R"([^\r\n\t ])", true);
-    auto it = tok.begin_string_only();
-    while (it!=tok.end_string_only())
-    {
-        auto aaaa = *it;
-        std::cout <<  aaaa << " ";
-        ++it;
-    }
-    */
     return 0;
 }
 
