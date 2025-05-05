@@ -2,6 +2,7 @@
 #include "trie.hpp"
 #include <functional>
 #include "tokenizer.hpp"
+#include <queue>
 
 //todo: add comments everywhere. get used to writing. also use built-in method definitions
 
@@ -130,4 +131,14 @@ private:
     int execute_sequence_of_functions(
         std::string const & input);
 
+private:
+
+    std::queue<std::string> parse_to_rpn_after(
+        std::string const & input);
+
+    std::queue<std::string> parse_to_rpn_before(
+        std::string const & input);
+
+    std::queue<std::string> parse_to_rpn_around(
+        std::string const & input);
 };

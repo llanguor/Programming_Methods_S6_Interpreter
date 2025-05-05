@@ -1,4 +1,5 @@
 #include "interpreter.hpp"
+
 #include "debugger.hpp"
 
 #pragma region static_fields
@@ -171,30 +172,139 @@ int interpreter_rpn::calculate_expression(std::string const &expression)
 
 std::string const interpreter_rpn::expression_to_reverse_polish_notation(std::string const &input)
 {
-    tokenizer tokenizer(
-                input,
-                _comments_enclosure_max_level,
-                R"([(),])",
-                R"([^(),])",
-                false);
-    for (
-        auto it = tokenizer.begin_string_only();
-        it != tokenizer.end_string_only();
-        ++it)
+    std::queue<std::string> input_queue;
+    switch (_arguments_position)
     {
-        std::cout<<"EXPRESSION_RES: ";
-        std::cout<<"["<<it->token<<"]["<<it->right_separator <<"]"<< std::endl;
+        case interpreter::after_operation:
+            input_queue=parse_to_rpn_after(input);
+            break;
+
+        case interpreter::before_operation:
+            input_queue=parse_to_rpn_before(input);
+            break;
+
+        case interpreter::around_operation:
+            input_queue=parse_to_rpn_around(input);
+            break;
     }
 
-    //todo: check end of line!
-    /*
-    EXPRESSION: add(div(var_2,5),rem(var_1,2))
-    ...
-    EXPRESSION_RES: [var_1][,]
-    EXPRESSION_RES: [2][)]      <-----!!!!!!!!!!
-    */
+    std::cout<<"Queue: ";
+    while (!input_queue.empty())
+    {
+        std::cout << input_queue.front() << " ";
+        input_queue.pop();
+    }
+    std::cout<<std::endl;
 
     return input;
+}
+
+std::queue<std::string> interpreter_rpn::parse_to_rpn_after(std::string const &input)
+{
+    std::stack<std::string> stack;
+    std::queue<std::string> queue;
+
+    tokenizer tokenizer(input,_comments_enclosure_max_level,
+                R"([(),])", R"([^(),])", false, true);
+
+    for (auto it = tokenizer.begin_string_only(); it != tokenizer.end_string_only(); ++it)
+    {
+        char separator = it->right_separator;
+
+        //last bracket
+        if (it->token=="")
+        {
+            if (separator!=',')
+            {
+                stack.push(std::string(1,separator));
+            }
+        }
+        //function
+        else if (separator=='(')
+        {
+            stack.push(it->token);
+            stack.push(std::string(1,separator));
+        }
+        //variable or number
+        else if (separator == ')' || separator == ',')
+        {
+            queue.push(it->token);
+            if (separator!=',')
+            {
+                stack.push(std::string(1,separator));
+            }
+        }
+
+        if (!stack.empty() && stack.top()==")")
+        {
+            while (!stack.empty() && stack.top()!="(")
+            {
+                stack.pop();
+            }
+            stack.pop();
+            queue.push(stack.top());
+            stack.pop();
+        }
+    }
+
+    return queue;
+}
+
+std::queue<std::string> interpreter_rpn::parse_to_rpn_before(std::string const &input)
+{
+    std::stack<std::string> stack;
+    std::queue<std::string> queue;
+
+    tokenizer tokenizer(input,_comments_enclosure_max_level,
+                R"([(),])", R"([^(),])", false, true);
+
+    for (auto it = tokenizer.begin_string_only(); it != tokenizer.end_string_only(); ++it)
+    {
+        char separator = it->left_separator;
+
+        //last bracket
+        if (it->token=="")
+        {
+            if (separator!=',')
+            {
+                stack.push(std::string(1,separator));
+            }
+        }
+        //function
+        else if (separator ==')')
+        {
+            stack.push(it->token);
+            stack.push(std::string(1,separator));
+        }
+        //variable or number
+        else if (separator == '(' || separator == ',')
+        {
+            if (separator!=',')
+            {
+                stack.push(std::string(1,separator));
+            }
+            queue.push(it->token);
+        }
+
+        if (!stack.empty() && stack.top()==")")
+        {
+            stack.pop();
+            queue.push(stack.top());
+            while (!stack.empty() && stack.top()!="(")
+            {
+                stack.pop();
+            }
+            stack.pop();
+        }
+    }
+
+    return queue;
+}
+
+std::queue<std::string> interpreter_rpn::parse_to_rpn_around(std::string const &input)
+{
+    std::queue<std::string> queue;
+    return queue;
 }
 
 int interpreter_rpn::execute_sequence_of_functions(std::string const &input)

@@ -20,6 +20,7 @@ private:
     size_t const _enclosure_max_level;
     std::regex const _regex_chars;
     std::regex const _regex_separators;
+    bool _emit_empty_tokens;
 
 public:
 
@@ -27,14 +28,17 @@ public:
        std::istream * stream,
        size_t const & enclosure_max_level,
        std::string const & regex_separators,
-       std::string const & regex_chars);
+       std::string const & regex_chars,
+       bool const & emit_empty_tokens=false);
 
     tokenizer(
-    std::string const &str,
+       std::string const &str,
        size_t const & enclosure_max_level,
        std::string const & regex_separators,
        std::string const & regex_chars,
-       bool const & is_file);
+       bool const & is_file,
+       bool const & emit_empty_tokens=false
+       );
 
 
 public:
@@ -52,12 +56,19 @@ public:
 
         char const right_separator;
 
+        char const left_separator;
+
     public:
 
         explicit iterator_data_string(
             std::string const & token,
-            char const & separator):
-        token(token), right_separator(separator) {};
+            char const & right_separator,
+            char const & left_separator):
+            token(token),
+            right_separator(right_separator),
+            left_separator(left_separator)
+        {
+        };
 
     };
 
@@ -90,6 +101,8 @@ public:
         std::regex const * _regex_separators;
         std::regex const * _regex_chars;
         std::shared_ptr<iterator_data> _current_data;
+        bool _emit_empty_tokens;
+        char last_separator = EOF;
 
     public:
 
@@ -97,7 +110,8 @@ public:
            std::istream * stream,
            size_t enclosure_max_level,
            std::regex const * regex_chars,
-           std::regex const * regex_separators);
+           std::regex const * regex_separators,
+           bool const & emit_empty_tokens);
 
     public:
 
@@ -123,7 +137,8 @@ public:
            std::istream * stream,
            size_t enclosure_max_level,
            std::regex const * regex_chars,
-           std::regex const * regex_separators);
+           std::regex const * regex_separators,
+           bool const & emit_empty_tokens);
 
         bool operator==(
             token_string_only_iterator const &other) const noexcept;

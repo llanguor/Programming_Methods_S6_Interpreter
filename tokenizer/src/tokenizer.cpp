@@ -6,11 +6,13 @@ tokenizer::tokenizer(
     std::istream * stream,
     size_t const & enclosure_max_level,
     std::string const & regex_separators,
-    std::string const & regex_chars):
+    std::string const & regex_chars,
+    bool const & emit_empty_tokens):
     _stream_ptr(stream),
     _enclosure_max_level(enclosure_max_level),
     _regex_chars(regex_chars),
-    _regex_separators(regex_separators)
+    _regex_separators(regex_separators),
+    _emit_empty_tokens(emit_empty_tokens)
 {
     if (_stream_ptr->fail())
     {
@@ -23,10 +25,12 @@ tokenizer::tokenizer(
     size_t const &enclosure_max_level,
     std::string const &regex_separators,
     std::string const &regex_chars,
-    bool const &is_file):
+    bool const &is_file,
+    bool const & emit_empty_tokens):
     _enclosure_max_level(enclosure_max_level),
     _regex_chars(regex_chars),
-    _regex_separators(regex_separators)
+    _regex_separators(regex_separators),
+    _emit_empty_tokens(emit_empty_tokens)
 {
     if (is_file)
     {
@@ -58,7 +62,8 @@ tokenizer::token_iterator tokenizer::begin() const
         _stream_ptr,
         _enclosure_max_level,
         &_regex_chars,
-        &_regex_separators);
+        &_regex_separators,
+        _emit_empty_tokens);
 }
 
 tokenizer::token_iterator tokenizer::end() const
@@ -67,7 +72,8 @@ tokenizer::token_iterator tokenizer::end() const
         nullptr,
         _enclosure_max_level,
         &_regex_chars,
-        &_regex_separators);
+        &_regex_separators,
+        _emit_empty_tokens);
 }
 
 
@@ -77,7 +83,8 @@ tokenizer::token_string_only_iterator tokenizer::begin_string_only() const
     _stream_ptr,
     _enclosure_max_level,
     &_regex_chars,
-    &_regex_separators);
+    &_regex_separators,
+    _emit_empty_tokens);
 }
 
 tokenizer::token_string_only_iterator tokenizer::end_string_only() const
@@ -86,7 +93,8 @@ tokenizer::token_string_only_iterator tokenizer::end_string_only() const
     nullptr,
     _enclosure_max_level,
     &_regex_chars,
-    &_regex_separators);
+    &_regex_separators,
+    _emit_empty_tokens);
 }
 
 #pragma endregion
@@ -97,11 +105,13 @@ tokenizer::token_iterator::token_iterator(
     std::istream * stream,
     size_t const enclosure_max_level,
     std::regex const * regex_chars,
-    std::regex const * regex_separators):
+    std::regex const * regex_separators,
+    bool const & emit_empty_tokens):
     _comments_handler(stream, enclosure_max_level),
     _comments_handler_it(_comments_handler.begin()),
     _regex_separators(regex_separators),
-    _regex_chars(regex_chars)
+    _regex_chars(regex_chars),
+    _emit_empty_tokens(emit_empty_tokens)
 {
     if (_comments_handler_it == _comments_handler.end())
     {
@@ -151,9 +161,10 @@ tokenizer::token_iterator & tokenizer::token_iterator::operator++()
 
         if (std::regex_match(str, *_regex_separators))
         {
-            if (!token.empty())
+            if (!token.empty() || _emit_empty_tokens)
             {
-                _current_data = std::make_shared<iterator_data_string>(token, current_char);
+                _current_data = std::make_shared<iterator_data_string>(token, current_char, last_separator);
+                last_separator = current_char;
                 return *this;
             }
         }
@@ -169,7 +180,7 @@ tokenizer::token_iterator & tokenizer::token_iterator::operator++()
 
     if (!token.empty())
     {
-        _current_data = std::make_shared<iterator_data_string>(token, EOF);
+        _current_data = std::make_shared<iterator_data_string>(token, EOF, last_separator);
     }
     else
     {
@@ -195,8 +206,9 @@ tokenizer::token_string_only_iterator::token_string_only_iterator(
     std::istream *stream,
     size_t enclosure_max_level,
     std::regex const *regex_chars,
-    std::regex const *regex_separators):
-    _it(stream, enclosure_max_level, regex_chars, regex_separators)
+    std::regex const *regex_separators,
+    bool const & emit_empty_tokens):
+    _it(stream, enclosure_max_level, regex_chars, regex_separators, emit_empty_tokens)
 {
 }
 
