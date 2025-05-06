@@ -8,14 +8,26 @@ std::string const operations::default_operations_alphabet = "abcdefghijklmnopqrs
 
 void operations::throw_if_unexpected_size(
     unsigned long long const & current_size,
+    unsigned long long const & min_size,
+    unsigned long long const & max_size)
+{
+    if (current_size<min_size || current_size>max_size)
+    {
+        std::string msg_part =
+            (min_size==max_size)?
+            std::to_string(min_size):
+            std::format("from {} to {}", min_size, max_size);
+
+        throw std::invalid_argument(
+                "Invalid number of arguments: "+ msg_part +" arguments expected");
+    }
+}
+
+void operations::throw_if_unexpected_size(
+    unsigned long long const & current_size,
     unsigned long long const &expected_size)
 {
-    if (current_size!=expected_size)
-    {
-        throw std::invalid_argument(
-            std::format(
-                "Invalid number of arguments: {} arguments expected", expected_size));
-    }
+    throw_if_unexpected_size(current_size, expected_size, expected_size);
 }
 
 
@@ -90,9 +102,9 @@ int operations::_not(std::vector<int> const &argv)
 
 int operations::input(std::vector<int> const &argv)
 {
-    throw_if_unexpected_size(argv.size(), 1);
-    int base_input = argv[0];
 
+    throw_if_unexpected_size(argv.size(), 0, 1);
+    int base_input = argv.size()==0 ? 10 : argv[0];
     if (base_input < 2 || base_input > 36)
     {
         throw std::invalid_argument("Base must be between 2 and 36.");
@@ -102,86 +114,22 @@ int operations::input(std::vector<int> const &argv)
     std::string input_value;
     std::cin >> input_value;
 
-    int result = 0;
-    int power = 1;
-
-    for (auto it = input_value.rbegin(); it != input_value.rend(); ++it)
-    {
-        char digit = *it;
-        int digit_value;
-
-        if (digit >= '0' && digit <= '9')
-        {
-            digit_value = digit - '0';
-        }
-        else if (digit >= 'a' && digit <= 'z')
-        {
-            digit_value = digit - 'a' + 10;
-        }
-        else if (digit >= 'A' && digit <= 'Z')
-        {
-            digit_value = digit - 'A' + 10;
-        }
-        else
-        {
-            throw std::invalid_argument("Invalid character in input.");
-        }
-
-        if (digit_value >= base_input)
-        {
-            throw std::invalid_argument("Digit out of range for the given base.");
-        }
-
-        result += digit_value * power;
-        power *= base_input;
-    }
-
-    return result;
-}
-
-int operations::output(std::vector<int> const &argv)
-{
-    throw_if_unexpected_size(argv.size(), 2);
-    int value = argv[0];
-    int base_output = argv[1];
-
-    if (base_output < 2 || base_output > 36)
-    {
-        throw std::invalid_argument("Base must be between 2 and 36.");
-    }
-
-    if (value < 0)
-    {
-        throw std::invalid_argument("Value must be non-negative.");
-    }
-
-    std::string result;
-    if (value == 0)
-    {
-        result = "0";
-    }
-    else
-    {
-        while (value > 0)
-        {
-            int digit = value % base_output;
-            result.push_back(
-                digit < 10 ?
-                '0' + digit :
-                'a' + (digit - 10));
-            value /= base_output;
-        }
-
-        std::reverse(result.begin(), result.end());
-    }
-
-    std::cout << "Output in base " << base_output << ": " << result << std::endl;
-    return 0;
+    return base_to_decimal(input_value, base_input);
 }
 
 #pragma endregion
 
 #pragma region binary
+
+int operations::output(std::vector<int> const &argv)
+{
+    throw_if_unexpected_size(argv.size(), 1, 2);
+    int value = argv[0];
+    int base_output = argv.size()==1? 10 : argv[1];
+
+    std::cout << "Output in base " << base_output << ": " << decimal_to_base(value, base_output) << std::endl;
+    return 0;
+}
 
 int operations::add(std::vector<int> const &argv)
 {

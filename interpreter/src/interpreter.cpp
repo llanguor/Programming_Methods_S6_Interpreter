@@ -6,6 +6,10 @@
 
 std::string const interpreter::default_variables_alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
+const std::string interpreter::system_variables::base_input = "base_input";
+const std::string interpreter::system_variables::base_output = "base_output";
+const std::string interpreter::system_variables::base_assign = "base_assign";
+
 #pragma endregion
 
 #pragma region constructors
@@ -34,9 +38,9 @@ interpreter::interpreter(
 {
     try
     {
-        _variables.upsert("base_input", base_input);
-        _variables.upsert("base_output", base_output);
-        _variables.upsert("base_assign", base_assign);
+        _variables.upsert(system_variables::base_input, base_input);
+        _variables.upsert(system_variables::base_output, base_output);
+        _variables.upsert(system_variables::base_assign, base_assign);
     }
     catch (std::out_of_range)
     {
@@ -129,11 +133,22 @@ void interpreter::run(
 
             auto _tokenizer_assignment_it = _tokenizer_assignment.begin_string_only();
             variable_to_assign = _tokenizer_assignment_it->token;
-            expression_str = (++_tokenizer_assignment_it)->token;
+
+            ++_tokenizer_assignment_it;
+            if (_tokenizer_assignment_it != _tokenizer_assignment.end_string_only())
+            {
+                expression_str = _tokenizer_assignment_it->token;
+            }
 
             if (_lvalues_position == interpreter::right)
             {
                 std::swap(variable_to_assign, expression_str);
+            }
+
+            if (expression_str.empty())
+            {
+                expression_str = variable_to_assign;
+                variable_to_assign.clear();
             }
         }
         catch (std::out_of_range e)
@@ -141,12 +156,20 @@ void interpreter::run(
             throw std::runtime_error("Invalid content in program file on line " + std::to_string(line_number));
         }
 
+        if (!variable_to_assign.empty() && std::isdigit(variable_to_assign[0]))
+        {
+            throw std::runtime_error(std::format("Incorrect variable name on line {}: first char can't be number", line_number));
+        }
+
 
         auto result = calculate_expression(expression_str, line_number);
 
         try
         {
-            _variables.upsert(variable_to_assign, std::move(result));
+            if (!variable_to_assign.empty() && variable_to_assign!="_")
+            {
+                _variables.upsert(variable_to_assign, std::move(result));
+            }
         }
         catch (std::out_of_range e)
         {

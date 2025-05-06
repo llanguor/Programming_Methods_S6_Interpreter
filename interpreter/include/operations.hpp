@@ -50,7 +50,12 @@ private:
 
     static void throw_if_unexpected_size(
         unsigned long long const & current_size,
-        unsigned long long const & expected_size);
+        unsigned long long const & min_size,
+        unsigned long long const & max_size);
+
+    static void throw_if_unexpected_size(
+        unsigned long long const & current_size,
+        unsigned long long const &expected_size);
 
 public:
 

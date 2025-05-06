@@ -21,6 +21,14 @@ public:
 
     static std::string const default_variables_alphabet;
 
+    static struct system_variables
+    {
+    public:
+        static const std::string base_input;
+        static const std::string base_output;
+        static const std::string base_assign;
+    }  system_variables;
+
 protected:
 
     enum lvalues_position_types

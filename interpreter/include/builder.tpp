@@ -59,6 +59,11 @@ interpreter::builder<interpreter_type> & interpreter::builder<interpreter_type>:
 template<typename interpreter_type>
 interpreter::builder<interpreter_type> & interpreter::builder<interpreter_type>::set_base_assign(size_t const & base)
 {
+    if (_base_assign<2 || _base_assign>36)
+    {
+        throw std::invalid_argument("base must be from 2 to 36");
+    }
+
     _base_assign = base;
     return *this;
 }
@@ -66,6 +71,11 @@ interpreter::builder<interpreter_type> & interpreter::builder<interpreter_type>:
 template<typename interpreter_type>
 interpreter::builder<interpreter_type> & interpreter::builder<interpreter_type>::set_base_input(size_t const & base)
 {
+    if (_base_assign<2 || _base_assign>36)
+    {
+        throw std::invalid_argument("base must be from 2 to 36");
+    }
+
     _base_input = base;
     return *this;
 }
@@ -73,6 +83,11 @@ interpreter::builder<interpreter_type> & interpreter::builder<interpreter_type>:
 template<typename interpreter_type>
 interpreter::builder<interpreter_type> & interpreter::builder<interpreter_type>::set_base_output(size_t const & base)
 {
+    if (_base_assign<2 || _base_assign>36)
+    {
+        throw std::invalid_argument("base must be from 2 to 36");
+    }
+
     _base_output = base;
     return *this;
 }
@@ -120,8 +135,6 @@ interpreter_type * interpreter::builder<interpreter_type>::build()
         ++token)
     {
         auto token_str = token->token;
-        std::cout << token_str << " ";
-
 
         if (token_str=="left=")
         {
