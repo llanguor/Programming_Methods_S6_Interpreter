@@ -3,10 +3,8 @@
 #include <fstream>
 #include <map>
 #include <variant>
-#include <sstream>
-#include <memory>
 
-class comments_handler
+class comments_handler final
 {
 
 private:
@@ -31,7 +29,7 @@ public:
 
 public:
 
-    class control_char_iterator
+    class control_char_iterator final
     {
     private:
 
@@ -65,7 +63,7 @@ public:
     };
 
 
-    class char_iterator
+    class char_iterator final
     {
     private:
 

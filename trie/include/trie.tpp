@@ -1,7 +1,6 @@
 #pragma once
-
 #include <utility>
-
+#include <set>
 #include "trie.hpp"
 
 
@@ -39,7 +38,7 @@ trie<tvalue>::trie(
 
 template<
     typename tvalue>
-std::stack<typename std::shared_ptr<typename trie<tvalue>::node>*> trie<tvalue>::find_path(
+std::stack<std::shared_ptr<typename trie<tvalue>::node>*> trie<tvalue>::find_path(
     std::string const &key)
 {
     std::stack<std::shared_ptr<trie::node>*> path;
@@ -172,7 +171,7 @@ trie<tvalue>::iterator_data::iterator_data(
 template<typename tvalue>
 trie<tvalue>::iterator_base::iterator_base(
     std::map<char, size_t> const &alphabet,
-    typename trie<tvalue>::node *subtree_root):
+    trie<tvalue>::node *subtree_root):
     _alphabet_mapping(alphabet)
 {
     for (const auto &k: alphabet)
@@ -251,7 +250,7 @@ void trie<tvalue>::iterator_base::fall_to_next_bottom()
 template<typename tvalue>
 trie<tvalue>::infix_iterator::infix_iterator(
     std::map<char, size_t> const & alphabet,
-    typename trie<tvalue>::node *subtree_root):
+    trie<tvalue>::node *subtree_root):
     iterator_base(alphabet, subtree_root)
 {
     if (iterator_base::_stack.top()==nullptr)
@@ -268,7 +267,7 @@ trie<tvalue>::infix_iterator::infix_iterator(
 
     if (iterator_base::_stack.top()->value==std::nullopt)
     {
-        //all subtrees is nullptr and value is nullpt => tree is empty
+        //all subtrees are nullptr and value is nullptr => tree is empty
         iterator_base::_stack.push(nullptr);
     }
 }
@@ -342,7 +341,7 @@ typename trie<tvalue>::infix_iterator trie<tvalue>::begin() const noexcept
 {
     return trie<tvalue>::infix_iterator(
         _alphabet_mapping,
-        dynamic_cast<typename trie<tvalue>::node *>(&*_root)
+        dynamic_cast<trie<tvalue>::node *>(&*_root)
         );
 }
 

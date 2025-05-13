@@ -1,9 +1,6 @@
 #include "comments_handler.hpp"
-#include "comments_handler.hpp"
-#include "comments_handler.hpp"
-
 #include <iostream>
-#include <optional>
+
 
 #pragma region static_fields
 
@@ -171,8 +168,6 @@ comments_handler::control_char_iterator comments_handler::control_char_iterator:
 }
 
 #pragma endregion
-
-
 
 #pragma region char_iterator
 

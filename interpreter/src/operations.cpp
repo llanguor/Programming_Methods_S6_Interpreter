@@ -1,6 +1,6 @@
 #include "operations.hpp"
-
 #include <stdexcept>
+
 
 #pragma region operations_class implementation
 
@@ -85,7 +85,7 @@ std::string operations::decimal_to_base(
         }
 
         if (negative) result += '-';
-        std::reverse(result.begin(), result.end());
+        std::ranges::reverse(result);
         return result;
 }
 

@@ -1,10 +1,11 @@
-input(base_output)=var_5;
+var_5 = input(base_output);
 output(var_5, base_input);
-output(var_5, 16) = _;
+_ = output(var_5, 16);
 
-500 = var_1;
-mult(var_1, 4) = var_2;
+var_1 = 500;
+var_2 = mult(var_1, 4);
 #BREAKPOINT
-add(div(var_2, 5) , rem(var_1, 2)) = var_3;
-input(base_input) = var_5;
+
+var_3 = add(div(var_2, 4) , rem(var_1, 2));
+var_5 = input(base_input);
 #BREAKPOINT

@@ -1,4 +1,11 @@
 #include "../include/debugger.hpp"
+#include <iostream>
+#include <bitset>
+#include <sstream>
+#include <cmath>
+
+
+#pragma region handle_breakpont
 
 bool debugger::handle_breakpoint(interpreter &interpr)
 {
@@ -50,6 +57,10 @@ bool debugger::handle_breakpoint(interpreter &interpr)
     return true;
 }
 
+#pragma endregion
+
+#pragma region print
+
 void debugger::print_variable(interpreter &inter)
 {
     auto const value = get_variable_from_name(
@@ -71,7 +82,7 @@ void debugger::print_variable(interpreter &inter)
     std::cout<<"Memory dump: "<<dump_memory(value.value()) << std::endl;
 }
 
-void debugger::print_all_variables(interpreter &inter)
+void debugger::print_all_variables(interpreter const &inter)
 {
     std::cout<<"Variable list:"<<std::endl;
     for (auto const & variable : inter._variables)
@@ -79,6 +90,10 @@ void debugger::print_all_variables(interpreter &inter)
         std::cout<<variable.key<<"="<<variable.value<<std::endl;
     }
 }
+
+#pragma endregion
+
+#pragma region edit variables list
 
 void debugger::change_variable(interpreter &inter)
 {
@@ -169,6 +184,41 @@ void debugger::declare_variable(interpreter &inter)
 
 }
 
+void debugger::undeclare_variable(interpreter &inter)
+{
+    auto const name = get_name_from_input();
+
+    try
+    {
+        inter._variables.dispose(name);
+    }
+    catch (std::out_of_range const e)
+    {
+        std::cout<<e.what()<<std::endl;
+    }
+
+}
+
+#pragma endregion
+
+#pragma region private functions
+
+std::string debugger::dump_memory(int const &value)
+{
+    unsigned char const *ptr = reinterpret_cast<unsigned char const *>(&value);
+    std::stringstream ss;
+    for (size_t i = 0; i < sizeof(value); ++i)
+    {
+        ss << std::bitset<8>(ptr[i]);
+        if (i < sizeof(value) - 1)
+        {
+            ss << " ";
+        }
+    }
+
+    return ss.str();
+}
+
 int debugger::declare_variable_from_decimal(interpreter &inter)
 {
     return get_value_from_input();
@@ -234,7 +284,7 @@ int debugger::declare_variable_from_roman_numerals(interpreter &inter)
 
     for (char c : roman)
     {
-        if (roman_map.find(c) == roman_map.end())
+        if (!roman_map.contains(c))
         {
             throw std::invalid_argument("Invalid character in Roman numeral: " + std::string(1, c));
         }
@@ -270,20 +320,6 @@ int debugger::declare_variable_from_roman_numerals(interpreter &inter)
     return result;
 }
 
-void debugger::undeclare_variable(interpreter &inter)
-{
-    auto const name = get_name_from_input();
-
-    try
-    {
-        inter._variables.dispose(name);
-    }
-    catch (std::out_of_range const e)
-    {
-        std::cout<<e.what()<<std::endl;
-    }
-
-}
 
 std::string debugger::get_name_from_input()
 {
@@ -326,18 +362,4 @@ std::optional<int> debugger::get_variable_from_name(interpreter &inter, std::str
     }
 }
 
-std::string debugger::dump_memory(int const &value)
-{
-    unsigned char const *ptr = reinterpret_cast<unsigned char const *>(&value);
-    std::stringstream ss;
-    for (size_t i = 0; i < sizeof(value); ++i)
-    {
-        ss << std::bitset<8>(ptr[i]);
-        if (i < sizeof(value) - 1)
-        {
-            ss << " ";
-        }
-    }
-
-    return ss.str();
-}
+#pragma endregion

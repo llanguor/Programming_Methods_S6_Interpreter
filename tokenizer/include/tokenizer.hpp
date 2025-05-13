@@ -4,10 +4,9 @@
 #include <regex>
 #include <format>
 #include <iostream>
-#include <optional>
 #include <utility>
 
-class tokenizer
+class tokenizer final
 {
 public:
 
@@ -61,10 +60,10 @@ public:
     public:
 
         explicit iterator_data_string(
-            std::string const & token,
+            std::string token,
             char const & right_separator,
             char const & left_separator):
-            token(token),
+            token(std::move(token)),
             right_separator(right_separator),
             left_separator(left_separator)
         {
@@ -89,7 +88,7 @@ public:
 
 public:
 
-    class token_iterator
+    class token_iterator final
     {
 
     private:
@@ -124,7 +123,7 @@ public:
         token_iterator operator++(int not_used);
     };
 
-    class token_string_only_iterator
+    class token_string_only_iterator final
     {
 
     private:

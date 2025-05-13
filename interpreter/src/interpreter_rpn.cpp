@@ -26,23 +26,19 @@ int interpreter_rpn::calculate_expression(
 
 #pragma region functions
 
-std::queue<interpreter_rpn::expression_element> const
-    interpreter_rpn::expression_to_reverse_polish_notation(std::string const &input)
+std::queue<interpreter_rpn::expression_element>
+interpreter_rpn::expression_to_reverse_polish_notation(std::string const &input) const
 {
     std::queue<interpreter_rpn::expression_element> queue;
     switch (_arguments_position)
     {
         case interpreter::after_operation:
             return parse_to_rpn_after(input);
-            break;
-
         case interpreter::before_operation:
             return parse_to_rpn_before(input);
-            break;
 
         case interpreter::around_operation:
             return parse_to_rpn_around(input);
-            break;
     }
 
     return queue;
@@ -54,7 +50,7 @@ std::queue<interpreter_rpn::expression_element> const
 #pragma region parser functions
 
 std::queue<interpreter_rpn::expression_element>
-    interpreter_rpn::parse_to_rpn_after(std::string const &input)
+    interpreter_rpn::parse_to_rpn_after(std::string const &input) const
 {
     std::stack<std::string> stack;
     std::queue<expression_element> queue;
@@ -134,7 +130,8 @@ std::queue<interpreter_rpn::expression_element>
     return queue;
 }
 
-std::queue<interpreter_rpn::expression_element> interpreter_rpn::parse_to_rpn_before(std::string const &input)
+std::queue<interpreter_rpn::expression_element>
+interpreter_rpn::parse_to_rpn_before(std::string const &input) const
 {
     std::stack<std::string> stack;
     std::queue<expression_element> queue;
@@ -213,7 +210,8 @@ std::queue<interpreter_rpn::expression_element> interpreter_rpn::parse_to_rpn_be
     return queue;
 }
 
-std::queue<interpreter_rpn::expression_element> interpreter_rpn::parse_to_rpn_around(std::string const &input)
+std::queue<interpreter_rpn::expression_element>
+interpreter_rpn::parse_to_rpn_around(std::string const &input) const
 {
     bool last_token_is_operator = false;
     std::stack<std::string> stack;
@@ -307,7 +305,7 @@ int interpreter_rpn::entry_to_value(std::string const &variable)
     {
         value = _variables.obtain(variable);
     }
-    catch(std::out_of_range const &e)
+    catch(std::out_of_range const &)
     {
         value = operations::base_to_decimal(variable, _base_assign);
     }
@@ -351,7 +349,7 @@ int interpreter_rpn::execute_sequence_of_functions(
                 auto func = _operations.obtain(element.value);
                 stack.push(func(args));
             }
-            catch (std::out_of_range const &e)
+            catch (std::out_of_range const &)
             {
                 throw std::runtime_error("Function not found in the function list: " + element.value);
             }

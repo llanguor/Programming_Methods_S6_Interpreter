@@ -1,6 +1,6 @@
-var_1 = 500;
-var_2 = (var_1, 4)mult;
+500 = var_1;
+(var_1, 4)mult = var_2;
 #BREAKPOINT
-var3 = ((var_2, 5)div , (var_1, 2)rem)add;
-var_5 = (base_input)input;
+((var_2, 5)div , (var_1, 2)rem)add = var_3;
+(base_input)input = var_5;
 #BREAKPOINT

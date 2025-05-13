@@ -1,15 +1,10 @@
 #pragma once
 #include <fstream>
-#include <regex>
 #include <string>
-#include <optional>
-#include <utility>
-#include "operations.hpp"
 #include "interpreter.hpp"
-#include "tokenizer.hpp"
 
 template<typename interpreter_type>
-class interpreter::builder
+class interpreter::builder final
 {
 
 private:

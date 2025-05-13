@@ -1,11 +1,8 @@
 #pragma once
 #include "interpreter.hpp"
-#include <iostream>
-#include <bitset>
-#include <sstream>
-#include <cmath>
 
-class debugger
+
+class debugger final
 {
 
 public:
@@ -16,7 +13,7 @@ private:
 
     static void print_variable(interpreter & inter);
 
-    static void print_all_variables(interpreter & inter);
+    static void print_all_variables(interpreter const & inter);
 
     static void change_variable(interpreter & inter);
 

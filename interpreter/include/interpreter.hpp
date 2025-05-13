@@ -3,7 +3,6 @@
 #include <functional>
 #include "tokenizer.hpp"
 #include "operations.hpp"
-#include <queue>
 
 //todo: add comments everywhere. get used to writing. also use built-in method definitions
 
@@ -13,9 +12,7 @@ public:
 
     friend class debugger;
 
-    template<typename interpreter_type>
-    class builder;
-
+    template<typename interpreter_type> class builder;
 
 public:
 

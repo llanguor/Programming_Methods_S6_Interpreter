@@ -6,7 +6,7 @@
 #include "trie.hpp"
 #include <functional>
 
-class operations
+class operations final
 {
 
 public:
@@ -16,7 +16,7 @@ public:
 public:
 
     static trie<std::function<int(std::vector<int>)>> get_functions_trie(
-        std::string const & alphabet = default_operations_alphabet);
+        std::string const &alphabet = default_operations_alphabet);
 
 public:
 
@@ -49,12 +49,12 @@ public:
 private:
 
     static void throw_if_unexpected_size(
-        unsigned long long const & current_size,
-        unsigned long long const & min_size,
-        unsigned long long const & max_size);
+        unsigned long long const &current_size,
+        unsigned long long const &min_size,
+        unsigned long long const &max_size);
 
     static void throw_if_unexpected_size(
-        unsigned long long const & current_size,
+        unsigned long long const &current_size,
         unsigned long long const &expected_size);
 
 public:
@@ -63,6 +63,6 @@ public:
         std::string const &value, int const &base);
 
     static std::string decimal_to_base(
-        int const &value, int const & base);
+        int const &value, int const &base);
 
 };

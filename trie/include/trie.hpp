@@ -2,7 +2,6 @@
 #include "associative_container.hpp"
 #include <iostream>
 #include <map>
-#include <set>
 #include <stack>
 #include <vector>
 #include <optional>
@@ -19,7 +18,6 @@ private:
 
     struct node
     {
-
         std::vector<std::shared_ptr<node>> subtrees;
         std::optional<tvalue> value;
 
@@ -126,7 +124,7 @@ public:
 
         explicit iterator_base(
             std::map<char, size_t> const & alphabet,
-            typename trie<tvalue>::node *subtree_root);
+            trie<tvalue>::node *subtree_root);
 
         bool operator==(
             iterator_base const &other) const noexcept;
@@ -140,14 +138,14 @@ public:
     };
 
 
-    class infix_iterator final:iterator_base
+    class infix_iterator final: iterator_base
     {
 
     public:
 
         explicit infix_iterator(
             std::map<char, size_t> const & alphabet,
-            typename trie<tvalue>::node *subtree_root);
+            trie<tvalue>::node *subtree_root);
 
     public:
 
@@ -163,7 +161,6 @@ public:
             int not_used);
 
         iterator_data & operator*();
-
 
     };
 

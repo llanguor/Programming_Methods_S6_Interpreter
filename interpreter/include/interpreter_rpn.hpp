@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <queue>
+#include <utility>
 #include "interpreter.hpp"
 
 class interpreter_rpn final : public interpreter
@@ -12,7 +14,7 @@ private:
         function
     };
 
-    class expression_element
+    class expression_element final
     {
     public:
 
@@ -22,19 +24,19 @@ private:
 
         explicit expression_element(
             expression_element_type const & type,
-            std::string const & value):
+            std::string  value):
             type(type),
-            value(value),
+            value(std::move(value)),
             arguments_count(0)
         {
         }
 
         explicit expression_element(
             expression_element_type const & type,
-            std::string const & value,
+            std::string value,
             int const & arguments_count):
             type(type),
-            value(value),
+            value(std::move(value)),
             arguments_count(arguments_count)
         {
         }
@@ -42,7 +44,7 @@ private:
 
 public:
 
-    using interpreter::interpreter; //derived constructors
+    using interpreter::interpreter;
 
 private:
 
@@ -53,8 +55,8 @@ private:
 private:
 
     std::queue<interpreter_rpn::expression_element>
-        const expression_to_reverse_polish_notation(
-        std::string const & input);
+    expression_to_reverse_polish_notation(
+        std::string const &input) const;
 
     int execute_sequence_of_functions(
         std::queue<interpreter_rpn::expression_element> & input_queue);
@@ -62,13 +64,13 @@ private:
 private:
 
     std::queue<interpreter_rpn::expression_element> parse_to_rpn_after(
-        std::string const & input);
+        std::string const & input) const;
 
     std::queue<interpreter_rpn::expression_element> parse_to_rpn_before(
-        std::string const & input);
+        std::string const & input) const;
 
     std::queue<interpreter_rpn::expression_element> parse_to_rpn_around(
-        std::string const & input);
+        std::string const & input) const;
 
     int entry_to_value(
       std::string const & variable);

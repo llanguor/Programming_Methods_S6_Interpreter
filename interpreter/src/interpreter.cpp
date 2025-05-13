@@ -1,6 +1,6 @@
 #include "interpreter.hpp"
-
 #include "debugger.hpp"
+
 
 #pragma region static_fields
 
@@ -30,10 +30,10 @@ interpreter::interpreter(
     _lvalues_position(lvalues_position),
     _arguments_position(arguments_position),
     _comments_enclosure_max_level(comments_enclosure_max_level),
+    _is_debug_mode_enabled(is_debug_mode_enabled),
     _base_assign(base_assign),
     _base_input(base_input),
     _base_output(base_output),
-    _is_debug_mode_enabled(is_debug_mode_enabled),
     _variables(variables_alphabet)
 {
     try
@@ -42,7 +42,7 @@ interpreter::interpreter(
         _variables.upsert(system_variables::base_output, base_output);
         _variables.upsert(system_variables::base_assign, base_assign);
     }
-    catch (std::out_of_range)
+    catch (std::out_of_range&)
     {
         throw std::invalid_argument("the variable alphabet must include symbols for the interpreter's reserved words: base_input, base_output, base_assign");
     }
@@ -168,10 +168,10 @@ void interpreter::run(
         {
             if (!variable_to_assign.empty() && variable_to_assign!="_")
             {
-                _variables.upsert(variable_to_assign, std::move(result));
+                _variables.upsert(variable_to_assign, std::forward<int>(result));
             }
         }
-        catch (std::out_of_range e)
+        catch (std::out_of_range&)
         {
             throw std::out_of_range(
                 "Incorrect variable name at line " +
