@@ -298,20 +298,25 @@ interpreter_rpn::parse_to_rpn_around(std::string const &input) const
     return queue;
 }
 
-int interpreter_rpn::entry_to_value(std::string const &variable)
+int interpreter_rpn::entry_to_value(std::string const &value)
 {
-    int value;
+    std::size_t pos = 0;
     try
     {
-        value = _variables.obtain(variable);
+        int const number = std::stoi(value, &pos);
+        if (pos == value.size())
+        {
+            return operations::base_to_decimal(value, _base_assign);
+        }
+        else
+        {
+            return _variables.obtain(value);
+        }
     }
-    catch(std::out_of_range const &)
+    catch (...)
     {
-        value = operations::base_to_decimal(variable, _base_assign);
+        return _variables.obtain(value);
     }
-
-    return value;
-
 }
 
 #pragma endregion

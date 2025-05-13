@@ -1,11 +1,11 @@
-var_5 = input(base_output);
-output(var_5, base_input);
-_ = output(var_5, 16);
+#var_5 = input(base_output);
+#output(var_5, base_input);
+#_ = output(var_5, 16);
 
-var_1 = 500;
-var_2 = mult(var_1, 4);
-#BREAKPOINT
 
-var_3 = add(div(var_2, 4) , rem(var_1, 2));
-var_5 = input(base_input);
+var_2 = pow(0, 0);
+#output(var_2, 14);
+
+#var_3 = add(rem(var_2, var_2) , rem(10, 2));
 #BREAKPOINT
+#var_5 = input(base_input);

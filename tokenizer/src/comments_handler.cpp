@@ -59,7 +59,7 @@ comments_handler::control_char_iterator::control_char_iterator(
     }
     else
     {
-        _current_value = _stream->get();
+        ++(*this);
     }
 }
 

@@ -33,9 +33,12 @@ private:
 
     static int get_value_from_input();
 
-    static std::optional<int> get_base_from_input();
+    static int get_base_from_input();
 
     static std::optional<int> get_variable_from_name(interpreter &inter, std::string const & name);
 
     static std::string dump_memory(int const &value);
+
+    static int throw_if_input_not_number(std::string const & input);
+
 };

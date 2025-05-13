@@ -57,6 +57,9 @@ private:
         unsigned long long const &current_size,
         unsigned long long const &expected_size);
 
+    static void throw_if_incorrect_base(
+        size_t const & base);
+
 public:
 
     static int base_to_decimal(

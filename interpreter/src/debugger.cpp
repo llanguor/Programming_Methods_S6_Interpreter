@@ -3,15 +3,17 @@
 #include <bitset>
 #include <sstream>
 #include <cmath>
-
+#include <cctype>
+#include <stdexcept>
 
 #pragma region handle_breakpont
 
 bool debugger::handle_breakpoint(interpreter &interpr)
 {
-    int input = 0;
+    std::string input;
+    int choice = 0;
 
-    while (input!=6 && input!=7)
+    while (choice!=6 && choice!=7)
     {
         std::cout<<std::endl<<"--------- Interpreter debug menu ---------"<<std::endl;
         std::cout<<"Commands list:"<<std::endl;
@@ -25,32 +27,42 @@ bool debugger::handle_breakpoint(interpreter &interpr)
         std::cout<<"Enter number:"<<std::endl;
         std::cin>>input;
 
-        switch (input)
+        try
         {
-            case 1:
-                print_variable(interpr);
-                break;
-            case 2:
-                print_all_variables(interpr);
-                break;
-            case 3:
-                change_variable(interpr);
-                break;
-            case 4:
-                declare_variable(interpr);
-                break;
-            case 5:
-                undeclare_variable(interpr);
-                break;
-            case 6:
-                return true;
+            choice = throw_if_input_not_number(input);
 
-            case 7:
-                return false;
+            switch (choice)
+            {
+                case 1:
+                    print_variable(interpr);
+                    break;
+                case 2:
+                    print_all_variables(interpr);
+                    break;
+                case 3:
+                    change_variable(interpr);
+                    break;
+                case 4:
+                    declare_variable(interpr);
+                    break;
+                case 5:
+                    undeclare_variable(interpr);
+                    break;
+                case 6:
+                    return true;
 
-            default:
-                std::cout<<"Invalid input"<<std::endl;
-                break;
+                case 7:
+                    return false;
+
+                default:
+                    std::cout<<"Invalid input number"<<std::endl;
+                    break;
+            }
+        }
+        catch (std::exception const & e)
+        {
+            std::cout<<"Invalid input: " << e.what() << std::endl;
+            continue;
         }
     }
 
@@ -73,12 +85,8 @@ void debugger::print_variable(interpreter &inter)
     }
 
     auto const base = get_base_from_input();
-    if (base==std::nullopt)
-    {
-        return;
-    }
 
-    std::cout<<"Value: "<< operations::decimal_to_base(value.value(), base.value()) <<std::endl;
+    std::cout<<"Value: "<< operations::decimal_to_base(value.value(), base) <<std::endl;
     std::cout<<"Memory dump: "<<dump_memory(value.value()) << std::endl;
 }
 
@@ -105,18 +113,13 @@ void debugger::change_variable(interpreter &inter)
 
 
     auto const base = get_base_from_input();
-    if (base==std::nullopt)
-    {
-        return;
-    }
-
     std::string value_str;
-    std::cout << "Enter variable value on base :" << base.value() << std::endl;
+    std::cout << "Enter variable value on base " << base << ":" << std::endl;
     std::cin >> value_str;
 
     try
     {
-        auto value = operations::base_to_decimal(value_str, base.value());
+        auto value = operations::base_to_decimal(value_str, base);
         inter._variables.upsert(name, std::move(value));
     }
     catch (std::out_of_range const e)
@@ -150,8 +153,9 @@ void debugger::declare_variable(interpreter &inter)
     std::cout<<"1. From decimal value"<<std::endl;
     std::cout<<"2. From Zeckendorf representation"<<std::endl;
     std::cout<<"3. From roman numerals"<<std::endl;
-    int input;
-    std::cin>>input;
+    std::string input_string;
+    std::cin>>input_string;
+    auto input = throw_if_input_not_number(input_string);
 
     try
     {
@@ -331,21 +335,24 @@ std::string debugger::get_name_from_input()
 
 int debugger::get_value_from_input()
 {
-    int value;
+    std::string input;
     std::cout << "Enter variable value:" << std::endl;
-    std::cin >> value;
-    return value;
+    std::cin >> input;
+    return throw_if_input_not_number(input);
 }
 
-std::optional<int> debugger::get_base_from_input()
+int debugger::get_base_from_input()
 {
-    int base;
+    std::string input;
     std::cout << "Enter base:" << std::endl;
-    std::cin >> base;
+    std::cin >> input;
+    int base = throw_if_input_not_number(input);
+
     if (base<2 || base>32)
     {
-        return std::nullopt;
+        throw std::invalid_argument("Base must be between 2 and 36.");
     }
+
     return base;
 }
 
@@ -362,4 +369,38 @@ std::optional<int> debugger::get_variable_from_name(interpreter &inter, std::str
     }
 }
 
+
+int debugger::throw_if_input_not_number(std::string const &input)
+{
+    if (input.empty())
+    {
+        throw std::invalid_argument("Input is empty");
+    }
+
+    size_t start = 0;
+    if (input[0] == '-')
+    {
+        start = 1;
+    }
+
+    for (size_t i = start; i < input.size(); ++i)
+    {
+        if (!std::isdigit(input[i])) {
+            throw std::invalid_argument("Input contains non-digit characters: " + input);
+        }
+    }
+
+    try
+    {
+        return std::stoi(input);
+    }
+    catch (const std::out_of_range&)
+    {
+        throw std::invalid_argument("Input is out of range for an integer: " + input);
+    }
+    catch (const std::invalid_argument&)
+    {
+        throw std::invalid_argument("Input is not a valid integer: " + input);
+    }
+}
 #pragma endregion

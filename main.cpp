@@ -53,11 +53,12 @@ int main(int argc, char* argv[])
         interpreter_builder->append_function_map(operations::get_functions_trie());
         interpreter_builder->set_variables_alphabet(interpreter::default_variables_alphabet);
     }
-    catch (std::runtime_error const &e)
+    catch (std::exception const &e)
     {
         std::cout<<e.what();
         return -1;
     }
+
 
     try
     {
@@ -92,6 +93,11 @@ int main(int argc, char* argv[])
         std::cout << "Incorrect arguments list";
         return -2;
     }
+    catch (std::exception const &e)
+    {
+        std::cout<<e.what();
+        return -3;
+    }
 
     std::unique_ptr<interpreter_rpn> interpr (interpreter_builder->build());
     interpreter_builder.reset();
@@ -103,6 +109,7 @@ int main(int argc, char* argv[])
     catch(const std::exception& e)
     {
         std::cout<<e.what()<<std::endl;
+        return -4;
     }
 
     return 0;

@@ -1,1 +1,1 @@
-../meta/input/settings2.txt
+../meta/input/settings1.txt
